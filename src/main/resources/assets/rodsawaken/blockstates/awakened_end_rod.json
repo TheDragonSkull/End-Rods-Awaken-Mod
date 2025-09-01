@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "facing=down,lit=true":  { "model": "rodsawaken:block/awakened_end_rod", "x": 180 },
+    "facing=down,lit=false": { "model": "rodsawaken:block/awakened_end_rod_off", "x": 180 },
+
+    "facing=east,lit=true":  { "model": "rodsawaken:block/awakened_end_rod", "x": 90, "y": 90 },
+    "facing=east,lit=false": { "model": "rodsawaken:block/awakened_end_rod_off", "x": 90, "y": 90 },
+
+    "facing=north,lit=true":  { "model": "rodsawaken:block/awakened_end_rod", "x": 90 },
+    "facing=north,lit=false": { "model": "rodsawaken:block/awakened_end_rod_off", "x": 90 },
+
+    "facing=south,lit=true":  { "model": "rodsawaken:block/awakened_end_rod", "x": 90, "y": 180 },
+    "facing=south,lit=false": { "model": "rodsawaken:block/awakened_end_rod_off", "x": 90, "y": 180 },
+
+    "facing=up,lit=true":  { "model": "rodsawaken:block/awakened_end_rod" },
+    "facing=up,lit=false": { "model": "rodsawaken:block/awakened_end_rod_off" },
+
+    "facing=west,lit=true":  { "model": "rodsawaken:block/awakened_end_rod", "x": 90, "y": 270 },
+    "facing=west,lit=false": { "model": "rodsawaken:block/awakened_end_rod_off", "x": 90, "y": 270 }
+  }
+}
