@@ -28,12 +28,12 @@ public class AwakenedEndRodMenu extends AbstractContainerMenu {
         ItemStackHandler handler = blockEntity.getItems();
 
         // Potion slots (0-2)
-        this.addSlot(new SlotItemHandler(handler, 0, 44, 17));
-        this.addSlot(new SlotItemHandler(handler, 1, 62, 17));
-        this.addSlot(new SlotItemHandler(handler, 2, 80, 17));
+        this.addSlot(new SlotItemHandler(handler, 0, 31, 42));
+        this.addSlot(new SlotItemHandler(handler, 1, 65, 42));
+        this.addSlot(new SlotItemHandler(handler, 2, 99, 42));
 
         // Sensor slot (3)
-        this.addSlot(new SlotItemHandler(handler, 3, 62, 53));
+        this.addSlot(new SlotItemHandler(handler, 3, 129, 30));
 
         // Inventory
         for (int row = 0; row < 3; ++row) {

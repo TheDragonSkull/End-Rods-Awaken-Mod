@@ -2,6 +2,7 @@ package net.thedragonskull.rodsawaken.block.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.NetworkHooks;
 import net.thedragonskull.rodsawaken.block.entity.AwakenedEndRodBE;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,20 +48,22 @@ public class AwakenedEndRod extends EndRodBlock implements EntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level level, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-
-        if (pPlayer.isSecondaryUseActive()) {
-            if (!level.isClientSide) {
-                boolean lit = pState.getValue(LIT);
-                BlockState newState = pState.setValue(LIT, !lit);
-                level.setBlock(pPos, newState, 3);
+    public InteractionResult use(BlockState state, Level level, BlockPos pos,
+                                 Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide) {
+            if (player.isSecondaryUseActive()) {
+                boolean lit = state.getValue(LIT);
+                level.setBlock(pos, state.setValue(LIT, !lit), 3);
+            } else {
+                BlockEntity be = level.getBlockEntity(pos);
+                if (be instanceof AwakenedEndRodBE rodBE) {
+                    NetworkHooks.openScreen((ServerPlayer) player, rodBE, pos);
+                }
             }
-
-            return InteractionResult.SUCCESS;
         }
-
-        return super.use(pState, level, pPos, pPlayer, pHand, pHit);
+        return InteractionResult.SUCCESS;
     }
+
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {

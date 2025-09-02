@@ -1,6 +1,7 @@
 package net.thedragonskull.rodsawaken;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Blocks;
@@ -17,6 +18,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.thedragonskull.rodsawaken.block.ModBlocks;
 import net.thedragonskull.rodsawaken.block.entity.ModBlockEntities;
 import net.thedragonskull.rodsawaken.item.ModItems;
+import net.thedragonskull.rodsawaken.screen.AwakenedEndRodScreen;
 import net.thedragonskull.rodsawaken.screen.ModMenuTypes;
 import org.slf4j.Logger;
 
@@ -31,7 +33,7 @@ public class RodsAwaken {
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModBlockEntities.register(modEventBus);
-        ModMenuTypes.AWAKENED_END_ROD_MENU.get();
+        ModMenuTypes.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
 
@@ -59,6 +61,7 @@ public class RodsAwaken {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
+            MenuScreens.register(ModMenuTypes.AWAKENED_END_ROD_MENU.get(), AwakenedEndRodScreen::new);
         }
     }
 }
