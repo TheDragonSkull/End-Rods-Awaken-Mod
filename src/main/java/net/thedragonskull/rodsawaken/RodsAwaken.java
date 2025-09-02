@@ -17,6 +17,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.thedragonskull.rodsawaken.block.ModBlocks;
 import net.thedragonskull.rodsawaken.block.entity.ModBlockEntities;
 import net.thedragonskull.rodsawaken.item.ModItems;
+import net.thedragonskull.rodsawaken.screen.ModMenuTypes;
 import org.slf4j.Logger;
 
 @Mod(RodsAwaken.MOD_ID)
@@ -30,6 +31,7 @@ public class RodsAwaken {
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModBlockEntities.register(modEventBus);
+        ModMenuTypes.AWAKENED_END_ROD_MENU.get();
 
         modEventBus.addListener(this::commonSetup);
 
