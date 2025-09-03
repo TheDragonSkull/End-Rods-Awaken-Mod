@@ -35,6 +35,7 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     private final int[] potionDurations = new int[3]; // Potion total duration
     private final int[] potionTimers = new int[3]; // Time left
     private final int[] potionColors = new int[3]; // Potion Effect Color
+    private final MobEffectInstance[] potionEffects = new MobEffectInstance[3]; // Potion Effect
 
     private final ItemStackHandler items = new ItemStackHandler(4) {
 
@@ -128,6 +129,14 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         return (float)potionTimers[slot] / (float)potionDurations[slot];
     }
 
+    public int getPotionTimeLeft(int slot) {
+        return potionTimers[slot];
+    }
+
+    public MobEffectInstance getPotionEffect(int slot) {
+        return potionEffects[slot];
+    }
+
     public int getCombinedPotionColor() {
         int r = 0, g = 0, b = 0, count = 0;
 
@@ -163,6 +172,7 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         potionDurations[slot] = effect.getDuration();
         potionTimers[slot] = effect.getDuration();
         potionColors[slot] = PotionUtils.getColor(stack);
+        potionEffects[slot] = effect;
 
         stack.shrink(1);
 
