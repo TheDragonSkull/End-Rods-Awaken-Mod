@@ -69,13 +69,22 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                     MobEffect mobEffect = effect.getEffect();
                     TextureAtlasSprite sprite = minecraft.getMobEffectTextures().get(mobEffect);
 
+                    int atlasSize = 128;
+
+                    int u0 = (int) (sprite.getU0() * atlasSize);
+                    int v0 = (int) (sprite.getV0() * atlasSize);
+                    int u1 = (int) (sprite.getU1() * atlasSize);
+                    int v1 = (int) (sprite.getV1() * atlasSize);
+
                     guiGraphics.blit(
                             sprite.atlasLocation(),
                             x + barX[i], y + 19,
                             18, 18,
-                            0,0,
-                            18, 18,
-                            128, 128
+                            u0, v0,
+                            u1 - u0,
+                            v1 - v0,
+                            atlasSize,
+                            atlasSize
                     );
 
                 }
@@ -103,6 +112,7 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
 
         for (int i = 0; i < 3; i++) {
             float progress = be.getPotionProgress(i);
+
             if (progress > 0f) {
                 int barStartX = x + barX[i];
                 int barStartY = y + barY;
@@ -120,6 +130,8 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                         guiGraphics.renderTooltip(this.font, tooltip, mouseX, mouseY);
                     }
                 }
+
+                //todo: tooltip hover effect?
             }
         }
     }
