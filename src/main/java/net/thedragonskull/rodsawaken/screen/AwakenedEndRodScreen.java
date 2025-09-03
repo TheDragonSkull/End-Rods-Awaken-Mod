@@ -6,11 +6,15 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Inventory;
 import net.thedragonskull.rodsawaken.RodsAwaken;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRodMenu> {
 
@@ -64,9 +68,19 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                 );
 
                 // Effect Icon Draw
-                MobEffectInstance effect = be.getPotionEffect(i);
-                if (effect != null && minecraft != null) {
-                    MobEffect mobEffect = effect.getEffect();
+                List<MobEffectInstance> effects = be.getPotionEffects(i);
+
+                if (effects != null && minecraft != null) {
+                    MobEffectInstance effectInstance;
+
+                    if (effects.size() == 1) {
+                        effectInstance = effects.get(0);
+                    } else {
+                        int index = (int)((System.currentTimeMillis() / 1000) % effects.size());
+                        effectInstance = effects.get(index);
+                    }
+
+                    MobEffect mobEffect = effectInstance.getEffect();
                     TextureAtlasSprite sprite = minecraft.getMobEffectTextures().get(mobEffect);
 
                     int atlasSize = 128;
@@ -90,7 +104,50 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                 }
 
             }
+
+            // --- Clear Buttons ---
+            int baseX = x + 34;
+            int baseY = y + 62;
+            int separation = 23 + 11;
+
+            int btnX = baseX + (i * separation);
+            int btnY = baseY;
+
+            boolean hovered = mouseX >= btnX && mouseX <= btnX + 11 &&
+                    mouseY >= btnY && mouseY <= btnY + 11;
+
+            int texX = hovered ? 11 : 0;
+            int texY = 166;
+
+            guiGraphics.blit(TEXTURE, btnX, btnY, texX, texY, 11, 11);
         }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            int baseX = (this.width - this.imageWidth) / 2 + 33;
+            int baseY = (this.height - this.imageHeight) / 2 + 62;
+            int separation = 24;
+
+            for (int i = 0; i < 3; i++) {
+                int btnX = baseX + (i * separation);
+                int btnY = baseY;
+
+                if (mouseX >= btnX && mouseX <= btnX + 11 &&
+                        mouseY >= btnY && mouseY <= btnY + 11) {
+
+                    onPotionButtonClicked(i);
+                    return true;
+                }
+            }
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private void onPotionButtonClicked(int slot) {
+        //this.menu.getBlockEntity().clearPotionSlot(slot);
     }
 
     @Override
@@ -114,6 +171,7 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
             float progress = be.getPotionProgress(i);
 
             if (progress > 0f) {
+                // --- Timer bar hover ---
                 int barStartX = x + barX[i];
                 int barStartY = y + barY;
                 int barEndX = barStartX + MAX_BAR_WIDTH;
@@ -131,7 +189,26 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                     }
                 }
 
-                //todo: tooltip hover effect?
+                // --- Effect Icon hover ---
+                int iconX = x + barX[i];
+                int iconY = y + 18;
+                int iconEndX = iconX + 19;
+                int iconEndY = iconY + 19;
+
+                if (mouseX >= iconX && mouseX <= iconEndX &&
+                        mouseY >= iconY && mouseY <= iconEndY) {
+
+                    List<MobEffectInstance> effects = be.getPotionEffects(i);
+
+                    if (!effects.isEmpty()) {
+                        List<Component> tooltips = new ArrayList<>();
+                        for (MobEffectInstance effect : effects) {
+                            MutableComponent name = Component.translatable(effect.getDescriptionId());
+                            tooltips.add(name);
+                        }
+                        guiGraphics.renderComponentTooltip(this.font, tooltips, mouseX, mouseY);
+                    }
+                }
             }
         }
     }

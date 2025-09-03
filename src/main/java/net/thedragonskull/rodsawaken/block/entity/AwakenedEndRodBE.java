@@ -28,6 +28,7 @@ import net.thedragonskull.rodsawaken.screen.AwakenedEndRodMenu;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
@@ -35,7 +36,7 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     private final int[] potionDurations = new int[3]; // Potion total duration
     private final int[] potionTimers = new int[3]; // Time left
     private final int[] potionColors = new int[3]; // Potion Effect Color
-    private final MobEffectInstance[] potionEffects = new MobEffectInstance[3]; // Potion Effect
+    private final List<MobEffectInstance>[] potionEffects = new List[3];
 
     private final ItemStackHandler items = new ItemStackHandler(4) {
 
@@ -84,6 +85,9 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
 
     public AwakenedEndRodBE(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.AWAKENED_END_ROD_BE.get(), pPos, pBlockState);
+        for (int i = 0; i < 3; i++) {
+            potionEffects[i] = new ArrayList<>();
+        }
     }
 
     public void tick() {
@@ -133,7 +137,7 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         return potionTimers[slot];
     }
 
-    public MobEffectInstance getPotionEffect(int slot) {
+    public List<MobEffectInstance> getPotionEffects(int slot) {
         return potionEffects[slot];
     }
 
@@ -167,12 +171,17 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         List<MobEffectInstance> effects = PotionUtils.getMobEffects(stack);
         if (effects.isEmpty()) return;
 
-        MobEffectInstance effect = effects.get(0);
+        potionEffects[slot].clear();
+        potionEffects[slot].addAll(effects);
 
-        potionDurations[slot] = effect.getDuration();
-        potionTimers[slot] = effect.getDuration();
+        int maxDuration = effects.stream()
+                .mapToInt(MobEffectInstance::getDuration)
+                .max()
+                .orElse(0);
+
+        potionDurations[slot] = maxDuration;
+        potionTimers[slot] = maxDuration;
         potionColors[slot] = PotionUtils.getColor(stack);
-        potionEffects[slot] = effect;
 
         stack.shrink(1);
 
