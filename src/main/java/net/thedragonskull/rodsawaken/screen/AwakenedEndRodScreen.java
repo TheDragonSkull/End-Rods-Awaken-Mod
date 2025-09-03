@@ -34,7 +34,33 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
 
+        // BG
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
+
+        var be = this.menu.getBlockEntity();
+
+        int MAX_BAR_WIDTH = 18;
+        int BAR_HEIGHT = 4;
+
+        int[] barX = {30, 64, 98};
+        int barY = 10;
+
+        for (int i = 0; i < 3; i++) {
+            float progress = be.getPotionProgress(i);
+            int width = (int)(progress * MAX_BAR_WIDTH);
+
+            if (width > 0) {
+                int color = be.getPotionColor(i) | 0xFF000000;
+
+                guiGraphics.fill(
+                        x + barX[i],
+                        y + barY,
+                        x + barX[i] + width,
+                        y + barY + BAR_HEIGHT,
+                        color
+                );
+            }
+        }
     }
 
     @Override

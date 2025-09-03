@@ -2,10 +2,15 @@ package net.thedragonskull.rodsawaken.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Inventory;
@@ -23,16 +28,25 @@ import net.thedragonskull.rodsawaken.screen.AwakenedEndRodMenu;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
+
+    private final int[] potionDurations = new int[3]; // Potion total duration
+    private final int[] potionTimers = new int[3]; // Time left
+    private final int[] potionColors = new int[3]; // Potion Effect Color
 
     private final ItemStackHandler items = new ItemStackHandler(4) {
 
         @Override
         protected void onContentsChanged(int slot) {
-            setChanged();
+            super.onContentsChanged(slot);
+            if (slot >= 0 && slot <= 2) {
+                ItemStack stack = items.getStackInSlot(slot);
+                if (!stack.isEmpty() && stack.getItem() == Items.POTION) {
+                    consumePotionIntoSlot(slot, stack);
+                }
+            }
         }
 
         @Override
@@ -72,6 +86,26 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     }
 
     public void tick() {
+        if (level != null && !level.isClientSide) {
+            boolean changed = false;
+
+            for (int i = 0; i < 3; i++) {
+                if (potionTimers[i] > 0) {
+                    potionTimers[i]--;
+
+                    if (potionTimers[i] == 0) {
+                        potionDurations[i] = 0;
+                        potionColors[i] = 0;
+                    }
+
+                    changed = true;
+                }
+            }
+
+            if (changed) {
+                setChanged();
+            }
+        }
     }
 
     public ItemStack getPotion(int index) {
@@ -85,27 +119,30 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         return items.getStackInSlot(3);
     }
 
+    public int getPotionColor(int slot) {
+        return potionColors[slot];
+    }
+
+    public float getPotionProgress(int slot) {
+        if (potionDurations[slot] == 0) return 0f;
+        return (float)potionTimers[slot] / (float)potionDurations[slot];
+    }
+
     public int getCombinedPotionColor() {
-        List<ItemStack> potions = new ArrayList<>();
+        int r = 0, g = 0, b = 0, count = 0;
+
         for (int i = 0; i < 3; i++) {
-            ItemStack stack = this.items.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() == Items.POTION) {
-                potions.add(stack);
+            int color = potionColors[i];
+            if (color != 0) {
+                r += (color >> 16) & 0xFF;
+                g += (color >> 8) & 0xFF;
+                b += color & 0xFF;
+                count++;
             }
         }
 
-        if (potions.isEmpty()) {
+        if (count == 0) {
             return 0xFFFFFFFF;
-        }
-
-        // Mix Potion Effect Colors
-        int r = 0, g = 0, b = 0, count = 0;
-        for (ItemStack potion : potions) {
-            int color = PotionUtils.getColor(potion);
-            r += (color >> 16) & 0xFF;
-            g += (color >> 8) & 0xFF;
-            b += color & 0xFF;
-            count++;
         }
 
         r /= count;
@@ -115,16 +152,64 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         return (r << 16) | (g << 8) | b;
     }
 
+    private void consumePotionIntoSlot(int slot, ItemStack stack) {
+        if (stack.isEmpty() || stack.getItem() != Items.POTION) return;
+
+        List<MobEffectInstance> effects = PotionUtils.getMobEffects(stack);
+        if (effects.isEmpty()) return;
+
+        MobEffectInstance effect = effects.get(0);
+
+        potionDurations[slot] = effect.getDuration();
+        potionTimers[slot] = effect.getDuration();
+        potionColors[slot] = PotionUtils.getColor(stack);
+
+        stack.shrink(1);
+
+        if (this.level != null) {
+            this.level.playSound(null, this.worldPosition, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS);
+            this.level.playSound(null, this.worldPosition, SoundEvents.ENDER_EYE_DEATH, SoundSource.BLOCKS);
+        }
+
+        if (stack.isEmpty()) {
+            items.setStackInSlot(slot, ItemStack.EMPTY);
+        } else {
+            items.setStackInSlot(slot, stack);
+        }
+
+        setChanged();
+    }
+
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
         items.deserializeNBT(tag.getCompound("Inventory"));
+
+        int[] d = tag.getIntArray("PotionDurations");
+        int[] t = tag.getIntArray("PotionTimers");
+        int[] c = tag.getIntArray("PotionColors");
+
+        System.arraycopy(d, 0, potionDurations, 0, Math.min(d.length, potionDurations.length));
+        System.arraycopy(t, 0, potionTimers, 0, Math.min(t.length, potionTimers.length));
+        System.arraycopy(c, 0, potionColors, 0, Math.min(c.length, potionColors.length));
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.put("Inventory", items.serializeNBT());
+
+        tag.putIntArray("PotionDurations", potionDurations);
+        tag.putIntArray("PotionTimers", potionTimers);
+        tag.putIntArray("PotionColors", potionColors);
+    }
+
+    @Override
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+        super.onDataPacket(net, pkt);
+        if (level != null && level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
     }
 
     @Nullable
