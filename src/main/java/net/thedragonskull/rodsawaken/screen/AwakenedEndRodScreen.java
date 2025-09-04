@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -12,6 +13,8 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Inventory;
 import net.thedragonskull.rodsawaken.RodsAwaken;
+import net.thedragonskull.rodsawaken.network.ClearPotionSlotPacket;
+import net.thedragonskull.rodsawaken.network.PacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,22 +116,41 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
             int btnX = baseX + (i * separation);
             int btnY = baseY;
 
-            boolean hovered = mouseX >= btnX && mouseX <= btnX + 11 &&
-                    mouseY >= btnY && mouseY <= btnY + 11;
+            boolean hovered = mouseX >= btnX && mouseX <= btnX + 10 &&
+                    mouseY >= btnY && mouseY <= btnY + 10;
 
-            int texX = hovered ? 11 : 0;
+            boolean hasEffect = be.hasEffectInSlot(i);
+
+            int texX;
+            if (hasEffect) {
+                texX = 0;
+                if (hovered) {
+                    texX = 22;
+                }
+            } else {
+                texX = 11;
+            }
+
             int texY = 166;
-
             guiGraphics.blit(TEXTURE, btnX, btnY, texX, texY, 11, 11);
+
+            // Tooltip
+            if (hovered) {
+                guiGraphics.renderTooltip(
+                        this.font,
+                        Component.literal("Clear Effect"),
+                        mouseX, mouseY
+                );
+            }
         }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            int baseX = (this.width - this.imageWidth) / 2 + 33;
+            int baseX = (this.width - this.imageWidth) / 2 + 34;
             int baseY = (this.height - this.imageHeight) / 2 + 62;
-            int separation = 24;
+            int separation = 23 + 11;
 
             for (int i = 0; i < 3; i++) {
                 int btnX = baseX + (i * separation);
@@ -137,7 +159,11 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                 if (mouseX >= btnX && mouseX <= btnX + 11 &&
                         mouseY >= btnY && mouseY <= btnY + 11) {
 
-                    onPotionButtonClicked(i);
+                    if (menu.getBlockEntity().hasEffectInSlot(i)) {
+                        onPotionButtonClicked(i);
+
+                        menu.getBlockEntity().clearPotionSlot(i);
+                    }
                     return true;
                 }
             }
@@ -147,7 +173,8 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
     }
 
     private void onPotionButtonClicked(int slot) {
-        //this.menu.getBlockEntity().clearPotionSlot(slot);
+        BlockPos pos = this.menu.getBlockEntity().getBlockPos();
+        PacketHandler.sendToServer(new ClearPotionSlotPacket(slot, pos));
     }
 
     @Override
@@ -204,6 +231,12 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                         List<Component> tooltips = new ArrayList<>();
                         for (MobEffectInstance effect : effects) {
                             MutableComponent name = Component.translatable(effect.getDescriptionId());
+
+                            int amp = effect.getAmplifier();
+                            if (amp > 0) {
+                                name = name.append(" ").append(Component.translatable("potion.potency." + amp));
+                            }
+
                             tooltips.add(name);
                         }
                         guiGraphics.renderComponentTooltip(this.font, tooltips, mouseX, mouseY);

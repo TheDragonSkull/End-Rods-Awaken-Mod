@@ -101,14 +101,21 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
                     if (potionTimers[i] == 0) {
                         potionDurations[i] = 0;
                         potionColors[i] = 0;
+                        potionEffects[i].clear();
                     }
 
                     changed = true;
+                    if (level != null) {
+                        BlockState state = getBlockState();
+                        level.sendBlockUpdated(worldPosition, state, state, 3);
+                    }
                 }
             }
 
             if (changed) {
                 setChanged();
+                BlockState state = getBlockState();
+                level.sendBlockUpdated(worldPosition, state, state, 3);
             }
         }
     }
@@ -141,6 +148,10 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         return potionEffects[slot];
     }
 
+    public boolean hasEffectInSlot(int slot) {
+        return potionTimers[slot] > 0 && !potionEffects[slot].isEmpty();
+    }
+
     public int getCombinedPotionColor() {
         int r = 0, g = 0, b = 0, count = 0;
 
@@ -163,6 +174,21 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         b /= count;
 
         return (r << 16) | (g << 8) | b;
+    }
+
+    public void clearPotionSlot(int slot) {
+        potionEffects[slot].clear();
+        potionDurations[slot] = 0;
+        potionTimers[slot] = 0;
+        potionColors[slot] = 0;
+
+        //items.setStackInSlot(slot, ItemStack.EMPTY);
+
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            BlockState state = getBlockState();
+            level.sendBlockUpdated(worldPosition, state, state, 3);
+        }
     }
 
     private void consumePotionIntoSlot(int slot, ItemStack stack) {
