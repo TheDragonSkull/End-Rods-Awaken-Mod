@@ -10,8 +10,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
@@ -19,7 +17,6 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -39,7 +36,9 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static net.thedragonskull.rodsawaken.block.custom.AwakenedEndRod.LIT;
 
@@ -103,11 +102,12 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     }
 
     public void tick() {
-        if (level == null) return;
+        if (level == null || level.isClientSide) return;
 
-        if (!level.isClientSide) {
-            boolean changed = false;
+        boolean changed = false;
+        boolean lit = getBlockState().getValue(LIT);
 
+        if (lit) {
             for (int i = 0; i < 3; i++) {
                 if (potionTimers[i] > 0) {
                     potionTimers[i]--;
@@ -116,6 +116,8 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
                         potionDurations[i] = 0;
                         potionColors[i] = 0;
                         potionEffects[i].clear();
+
+                        level.playSound(null, worldPosition, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS);
                     }
 
                     changed = true;
@@ -125,40 +127,40 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
                     }
                 }
             }
+        }
 
-            if (changed) {
-                setChanged();
-                BlockState state = getBlockState();
-                level.sendBlockUpdated(worldPosition, state, state, 3);
-            }
+        if (changed) {
+            setChanged();
+            BlockState state = getBlockState();
+            level.sendBlockUpdated(worldPosition, state, state, 3);
+        }
 
-            if (level.getBlockState(worldPosition).getValue(LIT)) {
-                if (level.getGameTime() % 2 == 0) {
+        if (lit) {
+            if (level.getGameTime() % 2 == 0) {
 
-                    boolean anyEffect = false;
-                    for (int i = 0; i < 3; i++) {
-                        if (hasEffectInSlot(i)) {
-                            anyEffect = true;
-                            break;
-                        }
+                boolean anyEffect = false;
+                for (int i = 0; i < 3; i++) {
+                    if (hasEffectInSlot(i)) {
+                        anyEffect = true;
+                        break;
                     }
-                    if (!anyEffect) return;
-
-                    double x = worldPosition.getX() + 0.5;
-                    double y = worldPosition.getY() + 0.5;
-                    double z = worldPosition.getZ() + 0.5;
-
-                    ((ServerLevel) level).sendParticles(
-                            ModParticles.AWAKENED_END_ROD_GLITTER.get(),
-                            x, y, z,
-                            2,
-                            0.1, 0.25, 0.1,
-                            0.2
-                    );
                 }
+                if (!anyEffect) return;
 
-                applyEffectsToNearby();
+                double x = worldPosition.getX() + 0.5;
+                double y = worldPosition.getY() + 0.5;
+                double z = worldPosition.getZ() + 0.5;
+
+                ((ServerLevel) level).sendParticles(
+                        ModParticles.AWAKENED_END_ROD_GLITTER.get(),
+                        x, y, z,
+                        2,
+                        0.1, 0.25, 0.1,
+                        0.2
+                );
             }
+
+            applyEffectsToNearby();
         }
     }
 
@@ -170,49 +172,57 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
 
         int refreshInterval = 40; // 2s
 
+        Map<MobEffect, Integer> mergedLevels = new HashMap<>();
+        for (int i = 0; i < 3; i++) {
+            if (potionTimers[i] <= 0 || potionEffects[i].isEmpty()) continue;
+
+            for (MobEffectInstance effect : potionEffects[i]) {
+                MobEffect mob = effect.getEffect();
+                if (mob.isInstantenous()) continue;
+
+                // usamos el nivel real (amplifier + 1)
+                int levelValue = effect.getAmplifier() + 1;
+                mergedLevels.merge(mob, levelValue, Integer::sum);
+            }
+        }
+
+        mergedLevels.replaceAll((mob, lvl) -> Math.min(lvl, 6));
+
         for (LivingEntity target : targets) {
-            for (int i = 0; i < 3; i++) {
-                if (potionTimers[i] <= 0 || potionEffects[i].isEmpty()) continue;
+            for (Map.Entry<MobEffect, Integer> entry : mergedLevels.entrySet()) {
+                MobEffect mob = entry.getKey();
+                int levelValue = entry.getValue();
 
-                for (MobEffectInstance effect : potionEffects[i]) {
-                    MobEffect mob = effect.getEffect();
-                    if (mob.isInstantenous()) continue;
+                int amplifier = levelValue - 1;
 
-                    MobEffectInstance current = target.getEffect(mob);
-                    boolean shouldApply = false;
+                MobEffectInstance current = target.getEffect(mob);
+                boolean shouldApply = false;
 
-                    if (current == null) {
+                if (current == null) {
+                    shouldApply = true;
+                } else {
+                    if (current.getAmplifier() < amplifier) {
                         shouldApply = true;
-                    } else {
-                        if (current.getAmplifier() < effect.getAmplifier()) {
-                            shouldApply = true;
-                        } else if (current.getDuration() <= refreshInterval / 2) {
-                            shouldApply = true;
-                        }
+                    } else if (current.getDuration() <= refreshInterval / 2) {
+                        shouldApply = true;
                     }
+                }
 
-                    if (shouldApply) {
-                        int applyDuration = Math.min(refreshInterval, potionTimers[i]);
-                        MobEffectInstance toApply = new MobEffectInstance(
-                                mob,
-                                applyDuration,
-                                effect.getAmplifier(),
-                                effect.isAmbient(),
-                                effect.isVisible(),
-                                effect.showIcon()
-                        );
-                        target.addEffect(toApply);
-                    }
+                if (shouldApply) {
+                    int applyDuration = refreshInterval;
+                    MobEffectInstance toApply = new MobEffectInstance(
+                            mob,
+                            applyDuration,
+                            amplifier,
+                            false,
+                            true,
+                            true
+                    );
+
+                    target.addEffect(toApply);
                 }
             }
         }
-    }
-
-    public ItemStack getPotion(int index) {
-        if (index >= 0 && index <= 2) {
-            return items.getStackInSlot(index);
-        }
-        return ItemStack.EMPTY;
     }
 
     public ItemStack getSensor() {
