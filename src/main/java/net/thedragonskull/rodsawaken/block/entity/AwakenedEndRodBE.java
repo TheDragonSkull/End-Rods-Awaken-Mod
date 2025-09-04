@@ -10,13 +10,17 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -27,6 +31,7 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.block.SculkSensorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.items.ItemStackHandler;
 import net.thedragonskull.rodsawaken.particle.ModParticles;
 import net.thedragonskull.rodsawaken.screen.AwakenedEndRodMenu;
@@ -127,28 +132,78 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
                 level.sendBlockUpdated(worldPosition, state, state, 3);
             }
 
-            if (level.getGameTime() % 2 == 0 && level.getBlockState(worldPosition).getValue(LIT)) {
+            if (level.getBlockState(worldPosition).getValue(LIT)) {
+                if (level.getGameTime() % 2 == 0) {
 
-                boolean anyEffect = false;
-                for (int i = 0; i < 3; i++) {
-                    if (hasEffectInSlot(i)) {
-                        anyEffect = true;
-                        break;
+                    boolean anyEffect = false;
+                    for (int i = 0; i < 3; i++) {
+                        if (hasEffectInSlot(i)) {
+                            anyEffect = true;
+                            break;
+                        }
+                    }
+                    if (!anyEffect) return;
+
+                    double x = worldPosition.getX() + 0.5;
+                    double y = worldPosition.getY() + 0.5;
+                    double z = worldPosition.getZ() + 0.5;
+
+                    ((ServerLevel) level).sendParticles(
+                            ModParticles.AWAKENED_END_ROD_GLITTER.get(),
+                            x, y, z,
+                            2,
+                            0.1, 0.25, 0.1,
+                            0.2
+                    );
+                }
+
+                applyEffectsToNearby();
+            }
+        }
+    }
+
+    private void applyEffectsToNearby() {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        AABB area = new AABB(worldPosition).inflate(5);
+        List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, area, LivingEntity::isAlive);
+
+        int refreshInterval = 40; // 2s
+
+        for (LivingEntity target : targets) {
+            for (int i = 0; i < 3; i++) {
+                if (potionTimers[i] <= 0 || potionEffects[i].isEmpty()) continue;
+
+                for (MobEffectInstance effect : potionEffects[i]) {
+                    MobEffect mob = effect.getEffect();
+                    if (mob.isInstantenous()) continue;
+
+                    MobEffectInstance current = target.getEffect(mob);
+                    boolean shouldApply = false;
+
+                    if (current == null) {
+                        shouldApply = true;
+                    } else {
+                        if (current.getAmplifier() < effect.getAmplifier()) {
+                            shouldApply = true;
+                        } else if (current.getDuration() <= refreshInterval / 2) {
+                            shouldApply = true;
+                        }
+                    }
+
+                    if (shouldApply) {
+                        int applyDuration = Math.min(refreshInterval, potionTimers[i]);
+                        MobEffectInstance toApply = new MobEffectInstance(
+                                mob,
+                                applyDuration,
+                                effect.getAmplifier(),
+                                effect.isAmbient(),
+                                effect.isVisible(),
+                                effect.showIcon()
+                        );
+                        target.addEffect(toApply);
                     }
                 }
-                if (!anyEffect) return;
-
-                double x = worldPosition.getX() + 0.5;
-                double y = worldPosition.getY() + 0.5;
-                double z = worldPosition.getZ() + 0.5;
-
-                ((ServerLevel) level).sendParticles(
-                        ModParticles.AWAKENED_END_ROD_GLITTER.get(),
-                        x, y, z,
-                        1,
-                        0.1, 0.25, 0.1,
-                        0.1 //todo: modify based on detection distance (5 block?)
-                );
             }
         }
     }
