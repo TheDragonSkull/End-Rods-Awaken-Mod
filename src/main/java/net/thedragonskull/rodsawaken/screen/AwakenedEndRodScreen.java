@@ -73,7 +73,7 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                 // Effect Icon Draw
                 List<MobEffectInstance> effects = be.getPotionEffects(i);
 
-                if (effects != null && minecraft != null) {
+                if (effects != null && !effects.isEmpty() && minecraft != null) {
                     MobEffectInstance effectInstance;
 
                     if (effects.size() == 1) {

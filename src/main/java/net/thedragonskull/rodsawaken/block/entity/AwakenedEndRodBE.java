@@ -2,6 +2,8 @@ package net.thedragonskull.rodsawaken.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -11,7 +13,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -217,12 +221,31 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         }
 
         if (stack.isEmpty()) {
-            items.setStackInSlot(slot, ItemStack.EMPTY);
+            items.setStackInSlot(slot, new ItemStack(Items.GLASS_BOTTLE));
         } else {
             items.setStackInSlot(slot, stack);
         }
 
         setChanged();
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("Inventory", items.serializeNBT());
+
+        tag.putIntArray("PotionDurations", potionDurations);
+        tag.putIntArray("PotionTimers", potionTimers);
+        tag.putIntArray("PotionColors", potionColors);
+
+        // Save effects
+        for (int i = 0; i < potionEffects.length; i++) {
+            ListTag listTag = new ListTag();
+            for (MobEffectInstance effect : potionEffects[i]) {
+                listTag.add(effect.save(new CompoundTag()));
+            }
+            tag.put("PotionEffects" + i, listTag);
+        }
     }
 
     @Override
@@ -237,16 +260,19 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         System.arraycopy(d, 0, potionDurations, 0, Math.min(d.length, potionDurations.length));
         System.arraycopy(t, 0, potionTimers, 0, Math.min(t.length, potionTimers.length));
         System.arraycopy(c, 0, potionColors, 0, Math.min(c.length, potionColors.length));
-    }
 
-    @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
-        tag.put("Inventory", items.serializeNBT());
-
-        tag.putIntArray("PotionDurations", potionDurations);
-        tag.putIntArray("PotionTimers", potionTimers);
-        tag.putIntArray("PotionColors", potionColors);
+        // Load effects
+        for (int i = 0; i < potionEffects.length; i++) {
+            potionEffects[i].clear();
+            ListTag listTag = tag.getList("PotionEffects" + i, Tag.TAG_COMPOUND);
+            for (int j = 0; j < listTag.size(); j++) {
+                CompoundTag effectTag = listTag.getCompound(j);
+                MobEffectInstance effect = MobEffectInstance.load(effectTag);
+                if (effect != null) {
+                    potionEffects[i].add(effect);
+                }
+            }
+        }
     }
 
     @Override
@@ -286,6 +312,14 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
 
     public ItemStackHandler getItems() {
         return items;
+    }
+
+    public Container asContainer() {
+        SimpleContainer container = new SimpleContainer(items.getSlots());
+        for (int i = 0; i < items.getSlots(); i++) {
+            container.setItem(i, items.getStackInSlot(i));
+        }
+        return container;
     }
 
     @Override
