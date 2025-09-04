@@ -28,12 +28,15 @@ import net.minecraft.world.level.block.SculkSensorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
+import net.thedragonskull.rodsawaken.particle.ModParticles;
 import net.thedragonskull.rodsawaken.screen.AwakenedEndRodMenu;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+
+import static net.thedragonskull.rodsawaken.block.custom.AwakenedEndRod.LIT;
 
 public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
 
@@ -95,7 +98,9 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     }
 
     public void tick() {
-        if (level != null && !level.isClientSide) {
+        if (level == null) return;
+
+        if (!level.isClientSide) {
             boolean changed = false;
 
             for (int i = 0; i < 3; i++) {
@@ -120,6 +125,30 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
                 setChanged();
                 BlockState state = getBlockState();
                 level.sendBlockUpdated(worldPosition, state, state, 3);
+            }
+
+            if (level.getGameTime() % 2 == 0 && level.getBlockState(worldPosition).getValue(LIT)) {
+
+                boolean anyEffect = false;
+                for (int i = 0; i < 3; i++) {
+                    if (hasEffectInSlot(i)) {
+                        anyEffect = true;
+                        break;
+                    }
+                }
+                if (!anyEffect) return;
+
+                double x = worldPosition.getX() + 0.5;
+                double y = worldPosition.getY() + 0.5;
+                double z = worldPosition.getZ() + 0.5;
+
+                ((ServerLevel) level).sendParticles(
+                        ModParticles.AWAKENED_END_ROD_GLITTER.get(),
+                        x, y, z,
+                        1,
+                        0.1, 0.25, 0.1,
+                        0.1 //todo: modify based on detection distance (5 block?)
+                );
             }
         }
     }

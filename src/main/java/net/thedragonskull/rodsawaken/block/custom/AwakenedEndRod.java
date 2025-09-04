@@ -45,6 +45,13 @@ public class AwakenedEndRod extends EndRodBlock implements EntityBlock {
 
         if (!pState.getValue(LIT)) return;
 
+        BlockEntity be = pLevel.getBlockEntity(pPos);
+        for (int i = 0; i < 3; i++) {
+            if (be instanceof AwakenedEndRodBE rodBE && rodBE.hasEffectInSlot(i)) {
+                return;
+            }
+        }
+
         super.animateTick(pState, pLevel, pPos, pRandom);
     }
 

@@ -19,6 +19,7 @@ import net.thedragonskull.rodsawaken.block.ModBlocks;
 import net.thedragonskull.rodsawaken.block.entity.ModBlockEntities;
 import net.thedragonskull.rodsawaken.item.ModItems;
 import net.thedragonskull.rodsawaken.network.PacketHandler;
+import net.thedragonskull.rodsawaken.particle.ModParticles;
 import net.thedragonskull.rodsawaken.screen.AwakenedEndRodScreen;
 import net.thedragonskull.rodsawaken.screen.ModMenuTypes;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ public class RodsAwaken {
         ModBlocks.register(modEventBus);
         ModBlockEntities.register(modEventBus);
         ModMenuTypes.register(modEventBus);
+        ModParticles.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
 

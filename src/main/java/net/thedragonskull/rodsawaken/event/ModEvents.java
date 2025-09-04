@@ -1,13 +1,15 @@
 package net.thedragonskull.rodsawaken.event;
 
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.thedragonskull.rodsawaken.RodsAwaken;
 import net.thedragonskull.rodsawaken.block.ModBlocks;
 import net.thedragonskull.rodsawaken.block.entity.AwakenedEndRodBE;
+import net.thedragonskull.rodsawaken.particle.ModParticles;
+import net.thedragonskull.rodsawaken.particle.custom.AwakenedEndRodGlitterParticles;
 
 @Mod.EventBusSubscriber(modid = RodsAwaken.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEvents {
@@ -29,4 +31,8 @@ public class ModEvents {
         );
     }
 
+    @SubscribeEvent
+    public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ModParticles.AWAKENED_END_ROD_GLITTER.get(), AwakenedEndRodGlitterParticles.Provider::new);
+    }
 }
