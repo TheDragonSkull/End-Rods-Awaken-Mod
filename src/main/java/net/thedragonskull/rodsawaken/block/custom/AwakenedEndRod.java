@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 import net.thedragonskull.rodsawaken.block.entity.AwakenedEndRodBE;
@@ -59,11 +60,23 @@ public class AwakenedEndRod extends EndRodBlock implements EntityBlock {
     public InteractionResult use(BlockState state, Level level, BlockPos pos,
                                  Player player, InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide) {
+            BlockEntity be = level.getBlockEntity(pos);
+
             if (player.isSecondaryUseActive()) {
                 boolean lit = state.getValue(LIT);
-                level.setBlock(pos, state.setValue(LIT, !lit), 3);
+                boolean newLit = !lit;
+                level.setBlock(pos, state.setValue(LIT, newLit), 3);
+
+                if (be instanceof AwakenedEndRodBE rod) {
+                    if (rod.isAutoMode()) {
+                        boolean playerNearbyNow = !level.getEntitiesOfClass(Player.class, new AABB(pos).inflate(4)).isEmpty();
+
+                        rod.setManualOverride(true);
+                        rod.setForcedLitState(newLit);
+                        rod.setManualOverrideTriggerPlayerNearby(playerNearbyNow);
+                    }
+                }
             } else {
-                BlockEntity be = level.getBlockEntity(pos);
                 if (be instanceof AwakenedEndRodBE rodBE) {
                     NetworkHooks.openScreen((ServerPlayer) player, rodBE, pos);
                 }

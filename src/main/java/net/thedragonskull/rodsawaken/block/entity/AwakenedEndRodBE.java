@@ -44,6 +44,11 @@ import static net.thedragonskull.rodsawaken.block.custom.AwakenedEndRod.LIT;
 
 public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
 
+    private boolean autoMode = false;
+    private boolean manualOverride = false;
+    private boolean manualOverrideTriggerPlayerNearby = false;
+    private boolean forcedLitState = false;
+
     private final int[] potionDurations = new int[3]; // Potion total duration
     private final int[] potionTimers = new int[3]; // Time left
     private final int[] potionColors = new int[3]; // Potion Effect Color
@@ -103,6 +108,8 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
 
     public void tick() {
         if (level == null || level.isClientSide) return;
+
+        handleSculkAutoMode();
 
         boolean changed = false;
         boolean lit = getBlockState().getValue(LIT);
@@ -225,8 +232,89 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         }
     }
 
-    public ItemStack getSensor() {
-        return items.getStackInSlot(3);
+    private void handleSculkAutoMode() {
+        if (level == null || level.isClientSide) return;
+
+        boolean hasNormal = hasNormalSculk();
+        boolean hasCalibrated = hasCalibratedSculk();
+
+        if (!hasNormal && !hasCalibrated) {
+            autoMode = false;
+            manualOverride = false;
+            return;
+        }
+
+        autoMode = true;
+
+        AABB area = new AABB(worldPosition).inflate(4);
+
+        boolean entityNearby;
+        if (hasCalibrated) {
+            entityNearby = !level.getEntitiesOfClass(LivingEntity.class, area, LivingEntity::isAlive).isEmpty();
+        } else { // normal sculk
+            entityNearby = !level.getEntitiesOfClass(Player.class, area).isEmpty();
+        }
+
+        BlockState state = getBlockState();
+        boolean lit = state.getValue(LIT);
+
+        if (manualOverride) {
+            if (state.getValue(LIT) != forcedLitState) {
+                level.setBlock(worldPosition, state.setValue(LIT, forcedLitState), 3);
+            }
+
+            if (entityNearby != manualOverrideTriggerPlayerNearby) {
+                manualOverride = false;
+            }
+            return;
+        }
+
+        if (entityNearby && !lit) {
+            level.setBlock(worldPosition, state.setValue(LIT, true), 3);
+        } else if (!entityNearby && lit) {
+            level.setBlock(worldPosition, state.setValue(LIT, false), 3);
+        }
+    }
+
+    public boolean isAutoMode() { return autoMode; }
+
+    public boolean isManualOverride() { return manualOverride; }
+
+    public boolean getForcedLitState() { return forcedLitState; }
+
+    public void setManualOverride(boolean manualOverride) {
+        this.manualOverride = manualOverride;
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
+    public void setManualOverrideTriggerPlayerNearby(boolean trigger) {
+        this.manualOverrideTriggerPlayerNearby = trigger;
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
+    public void setForcedLitState(boolean forced) {
+        this.forcedLitState = forced;
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
+
+    private boolean hasNormalSculk() {
+        ItemStack stack = items.getStackInSlot(3);
+        return !stack.isEmpty() && stack.is(Items.SCULK_SENSOR);
+    }
+
+    private boolean hasCalibratedSculk() {
+        ItemStack stack = items.getStackInSlot(3);
+        return !stack.isEmpty() && stack.is(Items.CALIBRATED_SCULK_SENSOR);
     }
 
     public int getPotionColor(int slot) {
@@ -328,9 +416,15 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         super.saveAdditional(tag);
         tag.put("Inventory", items.serializeNBT());
 
+        tag.putBoolean("AutoMode", autoMode);
+        tag.putBoolean("ManualOverride", manualOverride);
+        tag.putBoolean("ManualOverrideTriggerPlayerNearby", manualOverrideTriggerPlayerNearby);
+        tag.putBoolean("ForcedLitState", forcedLitState);
+
         tag.putIntArray("PotionDurations", potionDurations);
         tag.putIntArray("PotionTimers", potionTimers);
         tag.putIntArray("PotionColors", potionColors);
+
 
         // Save effects
         for (int i = 0; i < potionEffects.length; i++) {
@@ -346,6 +440,11 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     public void load(CompoundTag tag) {
         super.load(tag);
         items.deserializeNBT(tag.getCompound("Inventory"));
+
+        autoMode = tag.getBoolean("AutoMode");
+        manualOverride = tag.getBoolean("ManualOverride");
+        manualOverrideTriggerPlayerNearby = tag.getBoolean("ManualOverrideTriggerPlayerNearby");
+        forcedLitState = tag.getBoolean("ForcedLitState");
 
         int[] d = tag.getIntArray("PotionDurations");
         int[] t = tag.getIntArray("PotionTimers");
