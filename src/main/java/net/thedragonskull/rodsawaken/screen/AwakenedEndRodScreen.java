@@ -277,9 +277,10 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
 
         if (this.hoveredSlot != null && this.hoveredSlot.getSlotIndex() == 3 && !this.hoveredSlot.hasItem()) {
             if (Screen.hasShiftDown()) {
+
                 guiGraphics.renderTooltip(
                         this.font,
-                        List.of(Component.empty()),
+                        List.of(Component.literal(" ")),
                         Optional.of(new SensorSlotTooltip()),
                         mouseX,
                         mouseY

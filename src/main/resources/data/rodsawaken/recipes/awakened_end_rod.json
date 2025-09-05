@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " X ",
+    "#ZY",
+    " M "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "X":{
+      "item": "minecraft:dragon_breath"
+    },
+    "Y":{
+      "item": "minecraft:glowstone_dust"
+    },
+    "Z":{
+      "item": "minecraft:end_rod"
+    },
+    "M":{
+      "item": "minecraft:ender_eye"
+    }
+  },
+  "result": {
+    "item": "rodsawaken:awakened_end_rod",
+    "count": 1
+  },
+  "show_notification": true
+}
