@@ -41,7 +41,7 @@ public class ClearPotionSlotPacket {
 
             if (be instanceof AwakenedEndRodBE awakened) {
                 awakened.clearPotionSlot(slot);
-                level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS);
+                level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 1.0F);
             }
         });
         ctx.get().setPacketHandled(true);

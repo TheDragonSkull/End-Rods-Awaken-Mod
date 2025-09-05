@@ -3,6 +3,8 @@ package net.thedragonskull.rodsawaken.block.custom;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
@@ -66,6 +68,12 @@ public class AwakenedEndRod extends EndRodBlock implements EntityBlock {
                 boolean lit = state.getValue(LIT);
                 boolean newLit = !lit;
                 level.setBlock(pos, state.setValue(LIT, newLit), 3);
+
+                if (lit) {
+                    level.playSound(null, pos, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 0.75F, 1.0F);
+                } else {
+                    level.playSound(null, pos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.75F, 1.0F);
+                }
 
                 if (be instanceof AwakenedEndRodBE rod) {
                     if (rod.isAutoMode()) {

@@ -1,6 +1,7 @@
 package net.thedragonskull.rodsawaken.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -40,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static net.minecraft.world.level.block.entity.BeaconBlockEntity.playSound;
 import static net.thedragonskull.rodsawaken.block.custom.AwakenedEndRod.LIT;
 
 public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
@@ -124,7 +126,7 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
                         potionColors[i] = 0;
                         potionEffects[i].clear();
 
-                        level.playSound(null, worldPosition, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS);
+                        level.playSound(null, worldPosition, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 1.0F);
                     }
 
                     changed = true;
@@ -165,6 +167,10 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
                         0.1, 0.25, 0.1,
                         0.2
                 );
+            }
+
+            if (level.getGameTime() % 80L == 0L) {
+                level.playSound(null, worldPosition, SoundEvents.BEACON_AMBIENT, SoundSource.BLOCKS, 1.0F, 1.0F);
             }
 
             applyEffectsToNearby();
@@ -271,8 +277,24 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
 
         if (entityNearby && !lit) {
             level.setBlock(worldPosition, state.setValue(LIT, true), 3);
+            level.playSound(null, worldPosition, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.75F, 1.0F);
         } else if (!entityNearby && lit) {
             level.setBlock(worldPosition, state.setValue(LIT, false), 3);
+            level.playSound(null, worldPosition, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 0.75F, 1.0F);
+        }
+
+        if (!lit && !entityNearby) {
+            double x = worldPosition.getX() + 0.5;
+            double y = worldPosition.getY() + 0.5;
+            double z = worldPosition.getZ() + 0.5;
+
+            ((ServerLevel) level).sendParticles(
+                    ParticleTypes.SCULK_CHARGE_POP,
+                    x, y, z,
+                    1,
+                    0.1, 0.25, 0.1,
+                    0
+            );
         }
     }
 
