@@ -1,6 +1,7 @@
 package net.thedragonskull.rodsawaken.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -30,18 +31,22 @@ import net.minecraft.world.level.block.SculkSensorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.thedragonskull.rodsawaken.particle.ModParticles;
 import net.thedragonskull.rodsawaken.screen.AwakenedEndRodMenu;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.minecraft.world.level.block.entity.BeaconBlockEntity.playSound;
 import static net.thedragonskull.rodsawaken.block.custom.AwakenedEndRod.LIT;
 
 public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
@@ -74,6 +79,11 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
             if (stack.isEmpty()) return false;
 
             if (slot >= 0 && slot <= 2) {
+
+                if (!potionEffects[slot].isEmpty()) { //todo: or slot is blocked
+                    return false;
+                }
+
                 if (stack.getItem() == Items.POTION) {
                     List<MobEffectInstance> effects = PotionUtils.getMobEffects(stack);
 
@@ -106,6 +116,55 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         for (int i = 0; i < 3; i++) {
             potionEffects[i] = new ArrayList<>();
         }
+    }
+
+    private final LazyOptional<IItemHandler> hopperItemHandler = LazyOptional.of(() ->
+            new IItemHandler() {
+                @Override
+                public int getSlots() {
+                    return 3;
+                }
+
+                @Override
+                public @NotNull ItemStack getStackInSlot(int slot) {
+                    return items.getStackInSlot(slot);
+                }
+
+                @Override
+                public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+                    return items.insertItem(slot, stack, simulate);
+                }
+
+                @Override
+                public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+                    return items.extractItem(slot, amount, simulate);
+                }
+
+                @Override
+                public int getSlotLimit(int slot) {
+                    return items.getSlotLimit(slot);
+                }
+
+                @Override
+                public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+                    return items.isItemValid(slot, stack);
+                }
+            }
+    );
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+            return hopperItemHandler.cast();
+        }
+        return super.getCapability(cap, side);
+    }
+
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        hopperItemHandler.invalidate();
     }
 
     public void tick() {

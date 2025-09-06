@@ -16,7 +16,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.thedragonskull.rodsawaken.RodsAwaken;
 import net.thedragonskull.rodsawaken.network.ClearPotionSlotPacket;
 import net.thedragonskull.rodsawaken.network.PacketHandler;
@@ -262,6 +261,28 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
 
     @Override
     protected void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+
+        if (this.hoveredSlot != null) {
+            int index = this.hoveredSlot.getSlotIndex();
+
+            if (index >= 0 && index <= 2) {
+                ItemStack carried = this.menu.getCarried();
+
+                if (!carried.isEmpty() && carried.is(Items.POTION)
+                        && !this.menu.getBlockEntity().getPotionEffects(index).isEmpty()) {
+
+                    guiGraphics.renderTooltip(
+                            this.font,
+                            List.of(Component.literal("Clear the current effect first!").withStyle(ChatFormatting.RED)),
+                            Optional.empty(),
+                            mouseX,
+                            mouseY
+                    );
+                    return;
+                }
+            }
+        }
+
         if (this.menu.getCarried().isEmpty() && this.hoveredSlot != null && this.hoveredSlot.hasItem()) {
             ItemStack itemstack = this.hoveredSlot.getItem();
             guiGraphics.renderTooltip(
