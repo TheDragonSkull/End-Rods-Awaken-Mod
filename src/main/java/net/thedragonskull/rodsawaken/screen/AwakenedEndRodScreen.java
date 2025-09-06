@@ -16,6 +16,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.items.SlotItemHandler;
 import net.thedragonskull.rodsawaken.RodsAwaken;
 import net.thedragonskull.rodsawaken.network.ClearPotionSlotPacket;
 import net.thedragonskull.rodsawaken.network.PacketHandler;
@@ -262,14 +263,15 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
     @Override
     protected void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
 
-        if (this.hoveredSlot != null) {
-            int index = this.hoveredSlot.getSlotIndex();
+        if (this.hoveredSlot instanceof SlotItemHandler slotHandler &&
+                slotHandler.getItemHandler() == this.menu.getBlockEntity().getItems()) {
 
-            if (index >= 0 && index <= 2) {
+            int blockSlotIndex = slotHandler.getSlotIndex();
+            if (blockSlotIndex >= 0 && blockSlotIndex <= 2) {
                 ItemStack carried = this.menu.getCarried();
 
                 if (!carried.isEmpty() && carried.is(Items.POTION)
-                        && !this.menu.getBlockEntity().getPotionEffects(index).isEmpty()) {
+                        && !this.menu.getBlockEntity().getPotionEffects(blockSlotIndex).isEmpty()) {
 
                     guiGraphics.renderTooltip(
                             this.font,
@@ -281,43 +283,30 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                     return;
                 }
             }
-        }
 
-        if (this.menu.getCarried().isEmpty() && this.hoveredSlot != null && this.hoveredSlot.hasItem()) {
-            ItemStack itemstack = this.hoveredSlot.getItem();
-            guiGraphics.renderTooltip(
-                    this.font,
-                    this.getTooltipFromContainerItem(itemstack),
-                    itemstack.getTooltipImage(),
-                    itemstack,
-                    mouseX,
-                    mouseY
-            );
-            return;
-        }
+            if (blockSlotIndex == 3) {
+                if (Screen.hasShiftDown()) {
 
-        if (this.hoveredSlot != null && this.hoveredSlot.getSlotIndex() == 3 && !this.hoveredSlot.hasItem()) {
-            if (Screen.hasShiftDown()) {
+                    guiGraphics.renderTooltip(
+                            this.font,
+                            List.of(Component.literal(" ")),
+                            Optional.of(new SensorSlotTooltip()),
+                            mouseX,
+                            mouseY
+                    );
 
-                guiGraphics.renderTooltip(
-                        this.font,
-                        List.of(Component.literal(" ")),
-                        Optional.of(new SensorSlotTooltip()),
-                        mouseX,
-                        mouseY
-                );
-
-            } else {
-                guiGraphics.renderTooltip(
-                        this.font,
-                        List.of(
-                                Component.literal("Sculk Sensor Slot").withStyle(ChatFormatting.GRAY),
-                                Component.literal("Press Shift for more info").withStyle(ChatFormatting.YELLOW)
-                        ),
-                        Optional.empty(),
-                        mouseX,
-                        mouseY
-                );
+                } else {
+                    guiGraphics.renderTooltip(
+                            this.font,
+                            List.of(
+                                    Component.literal("Sculk Sensor Slot").withStyle(ChatFormatting.GRAY),
+                                    Component.literal("Press Shift for more info").withStyle(ChatFormatting.YELLOW)
+                            ),
+                            Optional.empty(),
+                            mouseX,
+                            mouseY
+                    );
+                }
             }
         }
     }
