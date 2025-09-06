@@ -26,6 +26,12 @@ public class PacketHandler {
                 .consumerMainThread(ClearPotionSlotPacket::handle)
                 .add();
 
+        INSTANCE.messageBuilder(C2SToggleBlockedSlotPacket.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(C2SToggleBlockedSlotPacket::encode)
+                .decoder(C2SToggleBlockedSlotPacket::new)
+                .consumerMainThread(C2SToggleBlockedSlotPacket::handle)
+                .add();
+
     }
 
     public static void sendToServer(Object msg) {

@@ -61,6 +61,8 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     private final int[] potionColors = new int[3]; // Potion Effect Color
     private final List<MobEffectInstance>[] potionEffects = new List[3];
 
+    private final boolean[] blockedSlots = new boolean[3];
+
     private final ItemStackHandler items = new ItemStackHandler(4) {
 
         @Override
@@ -80,7 +82,7 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
 
             if (slot >= 0 && slot <= 2) {
 
-                if (!potionEffects[slot].isEmpty()) { //todo: or slot is blocked
+                if (!potionEffects[slot].isEmpty() || isSlotBlocked(slot)) {
                     return false;
                 }
 
@@ -359,10 +361,6 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
 
     public boolean isAutoMode() { return autoMode; }
 
-    public boolean isManualOverride() { return manualOverride; }
-
-    public boolean getForcedLitState() { return forcedLitState; }
-
     public void setManualOverride(boolean manualOverride) {
         this.manualOverride = manualOverride;
         setChanged();
@@ -387,6 +385,25 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         }
     }
 
+    public void syncToClient() {
+        if (this.level instanceof ServerLevel serverLevel) {
+            serverLevel.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
+        }
+    }
+
+    public boolean isSlotBlocked(int slot) {
+        return blockedSlots[slot];
+    }
+
+    public void toggleBlocked(int slot) {
+        blockedSlots[slot] = !blockedSlots[slot];
+        setChanged();
+    }
+
+    public void setBlocked(int slot, boolean blocked) {
+        blockedSlots[slot] = blocked;
+        setChanged();
+    }
 
     private boolean hasNormalSculk() {
         ItemStack stack = items.getStackInSlot(3);
@@ -506,6 +523,12 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         tag.putIntArray("PotionTimers", potionTimers);
         tag.putIntArray("PotionColors", potionColors);
 
+        // Save blocked slots
+        int[] blocked = new int[blockedSlots.length];
+        for (int i = 0; i < blockedSlots.length; i++) {
+            blocked[i] = blockedSlots[i] ? 1 : 0;
+        }
+        tag.putIntArray("BlockedSlots", blocked);
 
         // Save effects
         for (int i = 0; i < potionEffects.length; i++) {
@@ -534,6 +557,12 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         System.arraycopy(d, 0, potionDurations, 0, Math.min(d.length, potionDurations.length));
         System.arraycopy(t, 0, potionTimers, 0, Math.min(t.length, potionTimers.length));
         System.arraycopy(c, 0, potionColors, 0, Math.min(c.length, potionColors.length));
+
+        // Load blocked slots
+        int[] blocked = tag.getIntArray("BlockedSlots");
+        for (int i = 0; i < blockedSlots.length && i < blocked.length; i++) {
+            blockedSlots[i] = blocked[i] == 1;
+        }
 
         // Load effects
         for (int i = 0; i < potionEffects.length; i++) {

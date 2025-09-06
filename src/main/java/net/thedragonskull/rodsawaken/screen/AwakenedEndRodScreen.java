@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.items.SlotItemHandler;
 import net.thedragonskull.rodsawaken.RodsAwaken;
+import net.thedragonskull.rodsawaken.network.C2SToggleBlockedSlotPacket;
 import net.thedragonskull.rodsawaken.network.ClearPotionSlotPacket;
 import net.thedragonskull.rodsawaken.network.PacketHandler;
 import net.thedragonskull.rodsawaken.util.SensorSlotTooltip;
@@ -171,6 +172,25 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
 
                         menu.getBlockEntity().clearPotionSlot(i);
                     }
+
+                    return true;
+                }
+
+                int x = (this.width - this.imageWidth) / 2;
+                int y = (this.height - this.imageHeight) / 2;
+
+                int[] barX = {30, 64, 98};
+                int iconY = y + 19;
+                int iconX = x + barX[i];
+                int iconEndX = iconX + 18;
+                int iconEndY = iconY + 18;
+
+                if (mouseX >= iconX && mouseX <= iconEndX &&
+                        mouseY >= iconY && mouseY <= iconEndY) {
+                    if (Screen.hasShiftDown()) {
+                        PacketHandler.sendToServer(new C2SToggleBlockedSlotPacket(i));
+                    }
+
                     return true;
                 }
             }
@@ -222,20 +242,30 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                         guiGraphics.renderTooltip(this.font, tooltip, mouseX, mouseY);
                     }
                 }
+            }
 
-                // --- Effect Icon hover ---
-                int iconX = x + barX[i];
-                int iconY = y + 18;
-                int iconEndX = iconX + 19;
-                int iconEndY = iconY + 19;
 
-                if (mouseX >= iconX && mouseX <= iconEndX &&
-                        mouseY >= iconY && mouseY <= iconEndY) {
+            // --- Effect Icon hover ---
+            int iconX = x + barX[i];
+            int iconY = y + 18;
+            int iconEndX = iconX + 19;
+            int iconEndY = iconY + 19;
 
+            boolean hoverIcon = mouseX >= iconX && mouseX <= iconEndX &&
+                    mouseY >= iconY && mouseY <= iconEndY;
+
+            if (hoverIcon) {
+                List<Component> tooltips = new ArrayList<>();
+
+                if (Screen.hasShiftDown()) {
+                    if (be.isSlotBlocked(i)) {
+                        tooltips.add(Component.literal("§cLocked"));
+                    } else {
+                        tooltips.add(Component.literal("§aUnlocked"));
+                    }
+                } else {
                     List<MobEffectInstance> effects = be.getPotionEffects(i);
-
                     if (!effects.isEmpty()) {
-                        List<Component> tooltips = new ArrayList<>();
                         for (MobEffectInstance effect : effects) {
                             MutableComponent name = Component.translatable(effect.getDescriptionId());
 
@@ -246,9 +276,32 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
 
                             tooltips.add(name);
                         }
-                        guiGraphics.renderComponentTooltip(this.font, tooltips, mouseX, mouseY);
                     }
                 }
+
+                if (!tooltips.isEmpty()) {
+                    guiGraphics.renderComponentTooltip(this.font, tooltips, mouseX, mouseY);
+                }
+            }
+
+            if (be.isSlotBlocked(i)) {
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+
+                guiGraphics.blit(TEXTURE, iconX + 1, iconY + 1, 0, 177, 18, 18);
+
+                RenderSystem.disableBlend();
+            }
+
+            if (hoverIcon) {
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+
+                if (Screen.hasShiftDown() && !be.isSlotBlocked(i)) {
+                    guiGraphics.blit(TEXTURE, iconX + 1, iconY + 1, 18, 177, 18, 18);
+                }
+
+                RenderSystem.disableBlend();
             }
         }
     }
