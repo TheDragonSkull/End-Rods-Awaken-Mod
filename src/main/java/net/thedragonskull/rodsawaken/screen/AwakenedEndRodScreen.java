@@ -189,6 +189,8 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                         mouseY >= iconY && mouseY <= iconEndY) {
                     if (Screen.hasShiftDown()) {
                         PacketHandler.sendToServer(new C2SToggleBlockedSlotPacket(i));
+
+
                     }
 
                     return true;
@@ -360,8 +362,12 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                             mouseY
                     );
                 }
+
+                return;
             }
         }
+
+        super.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
 

@@ -14,9 +14,9 @@ import java.util.List;
 public class SensorSlotTooltip implements TooltipComponent, ClientTooltipComponent {
 
     List<Pair<ItemStack, String>> entries = List.of(
-            Pair.of(new ItemStack(Items.SCULK_SENSOR), "→ Player detection (only)"),
-            Pair.of(new ItemStack(Items.CALIBRATED_SCULK_SENSOR), "→ Entity detection (any)")
-    );
+            Pair.of(new ItemStack(Items.SCULK_SENSOR), "→ Entity detection (any)"),
+            Pair.of(new ItemStack(Items.CALIBRATED_SCULK_SENSOR), "→ Player detection (only)")
+            );
 
     @Override
     public void renderImage(Font pFont, int pX, int pY, GuiGraphics pGuiGraphics) {
