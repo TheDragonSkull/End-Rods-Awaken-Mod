@@ -22,12 +22,14 @@ Ejemplo:
 
 # ⚙️ How it works
 
-## algo aqui:
+### algo aqui:
 
+gif de poner 2 pociones, apagarlo y encenderlo
 
-## Awakened End Rod Menu:
+### Awakened End Rod Menu:
 <img width="1859" height="721" alt="ui_annotated_trim" src="https://github.com/user-attachments/assets/9fb236ff-8196-4604-8128-aad20c4f142f" />  
 
+### Elements Explained
 | Nº | Element | Utility |
 |----|----------|---------|
 | 1  | Effect Duraton Bar | Shows a decreasing bar matching the effect duration; hover to check the exact time left |
