@@ -22,10 +22,6 @@ Ejemplo:
 
 # ⚙️ How it works
 
-### smth:
-
-<!-- gif de poner 2 pociones, apagarlo y encenderlo -->
-
 ### Awakened End Rod Menu:
 <img width="1859" height="721" alt="ui_annotated_trim" src="https://github.com/user-attachments/assets/9fb236ff-8196-4604-8128-aad20c4f142f" />  
 
@@ -38,6 +34,10 @@ Ejemplo:
 | 4  | Clear Effect Button | Clears the effect for the current slot |
 | 5  | Locked Slots | Locks a slot to prevent potions from being placed; toggled with Shift+Click |
 | 6  | Sculk Sensor Slot | Grants detection abilities depending on the type of sculk sensor inserted; |
+
+### Behavior:
+
+<!-- gif de poner 2 pociones, apagarlo y encenderlo -->
 
 ---
 
