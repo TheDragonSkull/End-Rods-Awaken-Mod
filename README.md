@@ -3,20 +3,22 @@
 ---
 
 # 📖 About
-<!-- Breve descripción del mod en 2-3 frases.
-Explica qué añade (Awakened End Rod), por qué es especial y qué objetivo tiene.
-Ejemplo: "Un bloque místico para almacenar y gestionar efectos de pociones" -->
+**End Rods Awaken** adds an upgraded version of the classic End Rods, the **Awakened End Rod**; a mystical block that channels potion effects into a controllable aura, in a similar way of how lingering potions work.  
+By storing potions, it allows players to combine and manage effects in an area of influence.  
+With its unique slots, locking system, and sculk sensor integration, the Awakened End Rod turns potion management into an interactive and strategic gameplay feature.
 
 ---
 
 # ✨ Features
-<!-- Lista de características principales en viñetas.
-Cada bullet puede ser corto (resumido) pero claro.
-Ejemplo:
-- Bloque con slots especiales para vapes imbuidos
-- Slot único para Sculk Sensor
-- Interfaz personalizada con tooltips dinámicos
-- Sistema de bloqueo/desbloqueo de slots con animaciones y sonidos -->
+- 🧪 **Potion Management** – Store up to 3 potion effects and project them to all entities in a 4-block radius.  
+- 🔒 **Slot Locking** – Lock/unlock potion slots to prevent unwanted effects; each slot has its own state.  
+- 🕒 **Dynamic GUI** – Custom interface with duration bars, effect icons, tooltips, and a clear button.  
+- 🎨 **Visual Feedback** – Block tint and particles change to reflect active potion colors (single or blended).  
+- 📡 **Sculk Sensor Slot** – Insert a sensor to activate the rod only when entities are nearby; calibrated sensors detect only players.  
+- 🔄 **Effect Combination** – Stack different effects or merge identical ones into stronger amplifiers (up to level VI).  
+- ⌨️ **Controls** – Shift+Click to toggle slots, show advanced info, or power the block on/off.  
+- ⚙️ **Automation** – Hopper-compatible potion slots for automated brewing systems.  
+- 🔊 **Audio Cues** – Interactive sounds when locking/unlocking slots and powering the block.  
 
 > Below you'll find how the Awakened End Rod behaves in-game: visuals, area effects, stacking rules, controls and interactions.
 
@@ -39,9 +41,10 @@ Ejemplo:
 
 ### Behavior:
 
- #### Visuals & Particles
-- When a potion is placed in any potion slot, the End Rod **tints to that potion's color** and emits particles of the same color.
-- If multiple potions are present the tint/particles **blend** (additive color mixing) to reflect the combination of active effects.
+#### Slot rules & interactions
+- **You cannot insert a potion into a slot that already has an active effect.** You must first clear the slot (clear button) or wait for the effect to end.
+- You cannot insert instant effect potions nor any type of potion besides the normal ones.
+- **Locked slots** (toggled with Shift + Click on the slot icon) cannot accept items while locked.
 
 #### Area of effect
 - Any **mob or player within a 4-block radius** of the Awakened End Rod will receive the active effect(s) while they last.
@@ -64,10 +67,6 @@ Ejemplo:
 > _GIF placeholder: show adding two potions to two slots, then Shift+Click on the block to turn off, then Shift+Click again to turn on._
 > `![Demo GIF](path/to/demo.gif)`
 
-#### Slot rules & interactions
-- **You cannot insert a potion into a slot that already has an active effect.** You must first clear the slot (clear button) or wait for the effect to end.
-- **Locked slots** (toggled with Shift + Click on the slot icon) cannot accept items while locked.
-
 #### Sculk Sensor behavior
 
 - Placing a sensor into the dedicated sensor slot enables automatic activation based on nearby entities.
@@ -81,6 +80,10 @@ Ejemplo:
 #### Hoppers / Automation
 - The block is **hopper-compatible for the potion slots** (hoppers can be used to insert potions into those slots or to extract the empty bottles).
 - The sensor slot is **not** intended for hopper insertion/automation.
+
+#### Visuals & Particles
+- When a potion is placed in any potion slot, the End Rod **tints to that potion's color** and emits particles of the same color.
+- If multiple potions are present the tint/particles **blend** (additive color mixing) to reflect the combination of active effects.
 
 ---
 
