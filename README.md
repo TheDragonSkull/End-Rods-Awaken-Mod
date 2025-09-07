@@ -21,21 +21,21 @@ Ejemplo:
 ---
 
 # ⚙️ How it works
-<img width="1859" height="721" alt="ui_annotated_trim" src="https://github.com/user-attachments/assets/9fb236ff-8196-4604-8128-aad20c4f142f" />
 
-| Nº | Elemento | Función |
+## algo aqui:
+
+
+## Awakened End Rod Menu:
+<img width="1859" height="721" alt="ui_annotated_trim" src="https://github.com/user-attachments/assets/9fb236ff-8196-4604-8128-aad20c4f142f" />  
+
+| Nº | Element | Utility |
 |----|----------|---------|
-| 1  | Slot de vape | Breve explicación |
-| 2  | Candado | Breve explicación |
-| 3  | Papelera | Breve explicación |
-| 4  | Slot de Sculk Sensor | Breve explicación |
-
-## ⌨️ Controls
-| Acción | Tecla | Descripción |
-|--------|-------|-------------|
-| Bloquear/Desbloquear slot | Shift + Click | Explicación |
-| Mostrar info avanzada | Shift (sobre tooltip) | Explicación |
-| Limpiar slot | Click en papelera | Explicación |
+| 1  | Effect Duraton Bar | Shows a decreasing bar matching the effect duration; hover to check the exact time left |
+| 2  | Effect Icon & Amplifier Level | Shows the icon of the effect; hover to check the name and amplifier level |
+| 3  | Potion Slots | Takes the potion and returns the empty bottle |
+| 4  | Clear Effect Button | Clears the effect for the current slot |
+| 5  | Locked Slots | Locks a slot to prevent potions from being placed; toggled with Shift+Click |
+| 6  | Sculk Sensor Slot | Grants detection abilities depending on the type of sculk sensor inserted; |
 
 ---
 
