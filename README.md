@@ -95,5 +95,8 @@ Ejemplo:
 ---
 
 # 📦 Dependencies
-<!-- Aquí van las dependencias necesarias, versión de Minecraft, Forge/NeoForge, etc. -->
+
+**Forge**
+
+- [Minecraft Forge](https://files.minecraftforge.net/net/minecraftforge/forge/)
 
