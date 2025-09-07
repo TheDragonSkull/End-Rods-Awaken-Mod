@@ -59,9 +59,6 @@ With its unique slots, locking system, and sculk sensor integration, the Awakene
   - Active effects **stop being applied** (entities no longer receive the effects while the rod is off).
 - When turned **on** again, the rod resumes normal behavior.
 
-> _GIF placeholder: show adding two potions to two slots, then Shift+Click on the block to turn off, then Shift+Click again to turn on._
-> `![Demo GIF](path/to/demo.gif)`
-
 #### Sculk Sensor behavior
 
 - Placing a sensor into the dedicated sensor slot enables automatic activation based on nearby entities.
@@ -89,6 +86,10 @@ With its unique slots, locking system, and sculk sensor integration, the Awakene
 | Max amplifier | VI |
 | Block on/off toggle | Shift + Click (on the block) |
 | Toggle slot lock | Shift + Click (on the effect icon) |
+
+---
+
+# 📷 Media
 
 ---
 
