@@ -10,15 +10,10 @@ With its unique slots, locking system, and sculk sensor integration, the Awakene
 ---
 
 # ✨ Features
-- 🧪 **Potion Management** – Store up to 3 potion effects and project them to all entities in a 4-block radius.  
-- 🔒 **Slot Locking** – Lock/unlock potion slots to prevent unwanted effects; each slot has its own state.  
+- 🧪 **Potion Management** – Store up to 3 potion effects and project them in a 4-block radius.  
 - 🕒 **Dynamic GUI** – Custom interface with duration bars, effect icons, tooltips, and a clear button.  
 - 🎨 **Visual Feedback** – Block tint and particles change to reflect active potion colors (single or blended).  
-- 📡 **Sculk Sensor Slot** – Insert a sensor to activate the rod only when entities are nearby; calibrated sensors detect only players.  
-- 🔄 **Effect Combination** – Stack different effects or merge identical ones into stronger amplifiers (up to level VI).  
-- ⌨️ **Controls** – Shift+Click to toggle slots, show advanced info, or power the block on/off.  
 - ⚙️ **Automation** – Hopper-compatible potion slots for automated brewing systems.  
-- 🔊 **Audio Cues** – Interactive sounds when locking/unlocking slots and powering the block.  
 
 > Below you'll find how the Awakened End Rod behaves in-game: visuals, area effects, stacking rules, controls and interactions.
 
