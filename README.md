@@ -37,7 +37,61 @@ Ejemplo:
 
 ### Behavior:
 
-<!-- gif de poner 2 pociones, apagarlo y encenderlo -->
+> Below you'll find how the Awakened End Rod behaves in-game: visuals, area effects, stacking rules, controls and interactions.
+
+ #### Visuals & Particles
+- When a potion is placed in any potion slot, the End Rod **tints to that potion's color** and emits particles of the same color.
+- If multiple potions are present the tint/particles **blend** (additive color mixing) to reflect the combination of active effects.
+
+#### Area of effect
+- Any **mob or player within a 4-block radius** of the Awakened End Rod will receive the active effect(s) while they last.
+- Multiple different effects are applied simultaneously: each active slot contributes its effect to entities inside the radius.
+
+#### Combining effects & amplifiers
+- **Different effects** (e.g., Speed + Regeneration) stack and are applied together.
+- **Multiple potions of the same effect** combine into higher amplifier levels.  
+  - Example: *Poison I + Poison II → Poison III*.  
+  - The amplifier can increase up to a **maximum of VI**.
+- Durations are tracked per-slot: each slot has its own remaining time and contributes accordingly.
+
+#### Power toggle (turning the block off)
+- **Shift + Click on the block** toggles the block power state (on/off).
+- When turned **off**:
+  - The rod **stops emitting light and particles**.
+  - Active effects **stop being applied** (entities no longer receive the effects while the rod is off).
+- When turned **on** again, the rod resumes normal behavior.
+
+> _GIF placeholder: show adding two potions to two slots, then Shift+Click on the block to turn off, then Shift+Click again to turn on._
+> `![Demo GIF](path/to/demo.gif)`
+
+#### Slot rules & interactions
+- **You cannot insert a potion into a slot that already has an active effect.** You must first clear the slot (clear button) or wait for the effect to end.
+- **Locked slots** (toggled with Shift + Click on the slot icon) cannot accept items while locked.
+
+#### Sculk Sensor behavior
+
+- Placing a sensor into the dedicated sensor slot enables automatic activation based on nearby entities.
+
+| Sensor Type | Detects | Behavior |
+|-------------|---------|---------|
+| **Sculk Sensor** | Any mob or player | Activates the rod while any detected entity is within 4 blocks; deactivates when area is clear |
+| **Calibrated Sculk Sensor** | Players only | Same behavior but only triggers for players (ignores mobs) |
+
+#### Hoppers / Automation
+- The block is **hopper-compatible for the potion slots** (hoppers can be used to insert potions into those slots or to extract the empty bottles).
+- The sensor slot is **not** intended for hopper insertion/automation.
+
+---
+
+#### Quick reference
+| Property | Value |
+|---------:|:------|
+| Potion slots | 3 |
+| Sensor slot | 1 (Sculk Sensor / Calibrated Sculk Sensor) |
+| Effect radius | 4 blocks |
+| Max amplifier | VI |
+| Block on/off toggle | Shift + Click (on the block) |
+| Toggle slot lock | Shift + Click (on the effect icon) |
 
 ---
 
