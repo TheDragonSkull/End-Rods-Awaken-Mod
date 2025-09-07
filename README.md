@@ -86,8 +86,6 @@ Ejemplo:
 #### Quick reference
 | Property | Value |
 |---------:|:------|
-| Potion slots | 3 |
-| Sensor slot | 1 (Sculk Sensor / Calibrated Sculk Sensor) |
 | Effect radius | 4 blocks |
 | Max amplifier | VI |
 | Block on/off toggle | Shift + Click (on the block) |
