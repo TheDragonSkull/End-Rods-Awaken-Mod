@@ -71,6 +71,7 @@ Ejemplo:
 #### Sculk Sensor behavior
 
 - Placing a sensor into the dedicated sensor slot enables automatic activation based on nearby entities.
+- **When a sensor is equipped but no entity is detected**, the block remains turned off **but emits subtle particles** to indicate a sensor is installed and waiting for a trigger.
 
 | Sensor Type | Detects | Behavior |
 |-------------|---------|---------|
