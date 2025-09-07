@@ -18,6 +18,8 @@ Ejemplo:
 - Interfaz personalizada con tooltips dinámicos
 - Sistema de bloqueo/desbloqueo de slots con animaciones y sonidos -->
 
+> Below you'll find how the Awakened End Rod behaves in-game: visuals, area effects, stacking rules, controls and interactions.
+
 ---
 
 # ⚙️ How it works
@@ -36,8 +38,6 @@ Ejemplo:
 | 6  | Sculk Sensor Slot | Grants detection abilities depending on the type of sculk sensor inserted; |
 
 ### Behavior:
-
-> Below you'll find how the Awakened End Rod behaves in-game: visuals, area effects, stacking rules, controls and interactions.
 
  #### Visuals & Particles
 - When a potion is placed in any potion slot, the End Rod **tints to that potion's color** and emits particles of the same color.
