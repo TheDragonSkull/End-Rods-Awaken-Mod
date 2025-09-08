@@ -97,6 +97,7 @@ If you find bugs please report so I can try to fix them.
 ---
 
 # 📷 Media
+![awakened_end_rod_1](https://github.com/user-attachments/assets/99dd1dcd-525b-464f-bcb0-0b83268b6fa1)
 
 ---
 
