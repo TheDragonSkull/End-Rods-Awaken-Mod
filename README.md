@@ -13,9 +13,22 @@ With its unique slots, locking system, and sculk sensor integration, the Awakene
 - 🧪 **Potion Management** – Store up to 3 potion effects and project them in a 4-block radius.  
 - 🕒 **Dynamic GUI** – Custom interface with duration bars, effect icons, tooltips, and a clear button.  
 - 🎨 **Visual Feedback** – Block tint and particles change to reflect active potion colors (single or blended).  
-- ⚙️ **Automation** – Hopper-compatible potion slots for automated brewing systems.  
+- ⚙️ **Automation** – Hopper-compatible potion slots for automated brewing systems.
+
+This mod supports multiplayer.  
+If you find bugs please report so I can try to fix them.  
 
 > Below you'll find how the Awakened End Rod behaves in-game: visuals, area effects, stacking rules, controls and interactions.
+
+ ---
+
+❗ IMPORTANT ❗
+
+This mod is **NOT** compatible with Optifine.
+
+---
+
+# 🛠 Crafting Recipe
 
 ---
 
