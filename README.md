@@ -39,7 +39,7 @@ If you find bugs please report so I can try to fix them.
 | 3  | Potion Slots | Takes the potion and returns the empty bottle |
 | 4  | Clear Effect Button | Clears the effect for the current slot |
 | 5  | Locked Slots | Locks a slot to prevent potions from being placed; toggled with Shift+Click |
-| 6  | Sculk Sensor Slot | Grants detection abilities depending on the type of sculk sensor inserted; |
+| 6  | Sculk Sensor Slot | Grants detection abilities depending on the type of sculk sensor inserted |
 
 ### Behavior:
 
