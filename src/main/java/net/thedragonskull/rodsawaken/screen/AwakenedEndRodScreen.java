@@ -30,7 +30,7 @@ import java.util.Optional;
 public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRodMenu> {
 
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(RodsAwaken.MOD_ID, "textures/gui/awakened_end_rod_screen.png");
+            new ResourceLocation(RodsAwaken.MOD_ID, "textures/gui/awakened_end_rod_screen.png");
 
     public AwakenedEndRodScreen(AwakenedEndRodMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);

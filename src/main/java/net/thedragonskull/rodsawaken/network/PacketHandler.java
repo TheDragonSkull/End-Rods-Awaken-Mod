@@ -11,7 +11,7 @@ import net.thedragonskull.rodsawaken.RodsAwaken;
 public class PacketHandler {
     private static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-            ResourceLocation.fromNamespaceAndPath(RodsAwaken.MOD_ID, "main"),
+            new ResourceLocation(RodsAwaken.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals);
