@@ -99,6 +99,12 @@ If you find bugs please report so I can try to fix them.
 # 📷 Media
 ![awakened_end_rod_1](https://github.com/user-attachments/assets/99dd1dcd-525b-464f-bcb0-0b83268b6fa1)
 
+<img width="2560" height="1361" alt="awakened_rod_ui" src="https://github.com/user-attachments/assets/a23e0592-4ca1-4a24-b4ec-78b93f0ab024" />
+
+<img width="2560" height="1361" alt="awakened_rod_on" src="https://github.com/user-attachments/assets/a4c7d554-b764-417f-a191-84119284a0b4" />
+
+<img width="2560" height="1361" alt="awakened_rod_sensor" src="https://github.com/user-attachments/assets/7ae193d3-c94e-4e9f-9dcd-8b7c47f2b146" />
+
 ---
 
 # 📦 Dependencies
