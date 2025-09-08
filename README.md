@@ -1,5 +1,11 @@
 <img width="2048" height="362" alt="rods_awaken_mod_banner" src="https://github.com/user-attachments/assets/5a045c5f-00c4-4e5c-a65c-efc7e9e3d055" />
 
+[![CurseForge Versions](https://cf.way2muchnoise.eu/versions/1343405.svg)](https://www.curseforge.com/minecraft/mc-mods/thedragons-mini-end-rods-awaken)
+[![CurseForge Downloads](https://cf.way2muchnoise.eu/short_1343405_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/thedragons-mini-end-rods-awaken)
+
+[![Modrinth Versions](https://img.shields.io/modrinth/game-versions/ITgb1CHd?label=Avaliable%20for&color=82ff80)](https://modrinth.com/mod/thedragons-mini-end-rods-awaken) 
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/ITgb1CHd?logo=modrinth&color=82ff80)](https://modrinth.com/mod/thedragons-mini-end-rods-awaken)
+
 ---
 
 # 📖 About
