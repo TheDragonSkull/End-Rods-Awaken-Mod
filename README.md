@@ -20,14 +20,6 @@ If you find bugs please report so I can try to fix them.
 
 > Below you'll find how the Awakened End Rod behaves in-game: visuals, area effects, stacking rules, controls and interactions.
 
- ---
-
-❗ IMPORTANT ❗
-
-This mod is **NOT** compatible with Optifine.
-
----
-
 # 🛠 Crafting Recipe
 
 <img width="1024" height="528" alt="awakened_end_rod_recipe" src="https://github.com/user-attachments/assets/9adcff15-7aa4-45f0-a6a4-7085d3459ceb" />
