@@ -29,8 +29,8 @@ public class RodsAwaken {
     public static final String MOD_ID = "rodsawaken";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public RodsAwaken() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public RodsAwaken(FMLJavaModLoadingContext context) {
+        IEventBus modEventBus = context.getModEventBus();
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);

@@ -22,7 +22,7 @@ public class ModBlocks {
             DeferredRegister.create(ForgeRegistries.BLOCKS, RodsAwaken.MOD_ID);
 
     public static final RegistryObject<Block> AWAKENED_END_ROD = registerBlock("awakened_end_rod",
-            () -> new AwakenedEndRod(BlockBehaviour.Properties.copy(Blocks.END_ROD).lightLevel(litRodEmission())));
+            () -> new AwakenedEndRod(BlockBehaviour.Properties.ofFullCopy(Blocks.END_ROD).lightLevel(litRodEmission())));
 
 
 
