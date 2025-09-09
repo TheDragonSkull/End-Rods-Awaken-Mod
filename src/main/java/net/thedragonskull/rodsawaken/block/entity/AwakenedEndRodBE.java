@@ -518,7 +518,7 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider pRegistries) {  //todo: test
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider pRegistries) {
         super.saveAdditional(tag, pRegistries);
         tag.put("Inventory", items.serializeNBT(pRegistries));
 
@@ -549,7 +549,7 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider pRegistries) {  //todo: test
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider pRegistries) {
         super.loadAdditional(tag, pRegistries);
         items.deserializeNBT(pRegistries, tag.getCompound("Inventory"));
 

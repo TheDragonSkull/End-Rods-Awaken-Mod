@@ -24,7 +24,7 @@
     }
   },
   "result": {
-    "item": "rodsawaken:awakened_end_rod",
+    "id": "rodsawaken:awakened_end_rod",
     "count": 1
   },
   "show_notification": true

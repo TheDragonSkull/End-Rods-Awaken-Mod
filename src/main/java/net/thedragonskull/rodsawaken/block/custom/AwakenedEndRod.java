@@ -2,12 +2,14 @@ package net.thedragonskull.rodsawaken.block.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -23,6 +25,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.thedragonskull.rodsawaken.block.entity.AwakenedEndRodBE;
+import net.thedragonskull.rodsawaken.screen.AwakenedEndRodMenu;
 import org.jetbrains.annotations.Nullable;
 
 public class AwakenedEndRod extends EndRodBlock implements EntityBlock {
@@ -83,9 +86,8 @@ public class AwakenedEndRod extends EndRodBlock implements EntityBlock {
                 }
             } else {
                 if (be instanceof AwakenedEndRodBE rodBE) {
-                    //NetworkHooks.openScreen((ServerPlayer) player, rodBE, pos);
-                    if (player instanceof ServerPlayer sp)
-                        sp.openMenu(rodBE); //todo: test
+                    ((ServerPlayer) player).openMenu(new SimpleMenuProvider(rodBE, Component.literal("Awakened End Rod")), pos);
+                    return InteractionResult.SUCCESS;
                 }
             }
         }
