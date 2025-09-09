@@ -29,7 +29,7 @@ import net.thedragonskull.rodsawaken.screen.AwakenedEndRodMenu;
 import org.jetbrains.annotations.Nullable;
 
 public class AwakenedEndRod extends EndRodBlock implements EntityBlock {
-    public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static final BooleanProperty LIT = BooleanProperty.create("lit");
 
     public AwakenedEndRod(Properties pProperties) {
         super(pProperties);
