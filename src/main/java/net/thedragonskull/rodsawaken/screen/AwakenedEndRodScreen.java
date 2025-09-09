@@ -20,7 +20,7 @@ import net.minecraft.world.item.Items;
 import net.minecraftforge.items.SlotItemHandler;
 import net.thedragonskull.rodsawaken.RodsAwaken;
 import net.thedragonskull.rodsawaken.network.C2SToggleBlockedSlotPacket;
-import net.thedragonskull.rodsawaken.network.ClearPotionSlotPacket;
+import net.thedragonskull.rodsawaken.network.C2SClearPotionSlotPacket;
 import net.thedragonskull.rodsawaken.network.PacketHandler;
 import net.thedragonskull.rodsawaken.util.SensorSlotTooltip;
 
@@ -204,7 +204,7 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
 
     private void onPotionButtonClicked(int slot) {
         BlockPos pos = this.menu.getBlockEntity().getBlockPos();
-        PacketHandler.sendToServer(new ClearPotionSlotPacket(slot, pos));
+        PacketHandler.sendToServer(new C2SClearPotionSlotPacket(slot, pos));
     }
 
     @Override

@@ -30,7 +30,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.block.SculkSensorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -519,9 +518,9 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
-        tag.put("Inventory", items.serializeNBT());
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider pRegistries) {  //todo: test
+        super.saveAdditional(tag, pRegistries);
+        tag.put("Inventory", items.serializeNBT(pRegistries));
 
         tag.putBoolean("AutoMode", autoMode);
         tag.putBoolean("ManualOverride", manualOverride);
@@ -543,16 +542,16 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         for (int i = 0; i < potionEffects.length; i++) {
             ListTag listTag = new ListTag();
             for (MobEffectInstance effect : potionEffects[i]) {
-                listTag.add(effect.save(new CompoundTag()));
+                listTag.add(effect.save());
             }
             tag.put("PotionEffects" + i, listTag);
         }
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider pRegistries) {
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider pRegistries) {  //todo: test
         super.loadAdditional(tag, pRegistries);
-        items.deserializeNBT(tag.getCompound("Inventory"));
+        items.deserializeNBT(pRegistries, tag.getCompound("Inventory"));
 
         autoMode = tag.getBoolean("AutoMode");
         manualOverride = tag.getBoolean("ManualOverride");

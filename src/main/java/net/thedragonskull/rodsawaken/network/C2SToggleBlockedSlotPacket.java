@@ -4,11 +4,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.thedragonskull.rodsawaken.block.entity.AwakenedEndRodBE;
 import net.thedragonskull.rodsawaken.screen.AwakenedEndRodMenu;
-
-import java.util.function.Supplier;
 
 public class C2SToggleBlockedSlotPacket {
     private final int slot;
@@ -25,25 +23,24 @@ public class C2SToggleBlockedSlotPacket {
         buf.writeVarInt(slot);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer player = ctx.get().getSender();
-            if (player != null && player.containerMenu instanceof AwakenedEndRodMenu menu) {
-                AwakenedEndRodBE be = menu.getBlockEntity();
+    public static void handle(C2SToggleBlockedSlotPacket msg, CustomPayloadEvent.Context ctx) {
+        ServerPlayer player = ctx.getSender();
+        if (player != null && player.containerMenu instanceof AwakenedEndRodMenu menu) {
+            AwakenedEndRodBE be = menu.getBlockEntity();
 
-                boolean wasBlocked = be.isSlotBlocked(slot);
-                be.toggleBlocked(slot);
-                be.setChanged();
-                be.syncToClient();
+            boolean wasBlocked = be.isSlotBlocked(msg.slot);
+            be.toggleBlocked(msg.slot);
+            be.setChanged();
+            be.syncToClient();
 
-                player.playNotifySound(
-                        wasBlocked ? SoundEvents.BAMBOO_WOOD_TRAPDOOR_OPEN : SoundEvents.BAMBOO_WOOD_TRAPDOOR_CLOSE,
-                        SoundSource.BLOCKS,
-                        1.0f,
-                        1.0f
-                );
-            }
-        });
-        ctx.get().setPacketHandled(true);
+            player.playNotifySound(
+                    wasBlocked ? SoundEvents.BAMBOO_WOOD_TRAPDOOR_OPEN : SoundEvents.BAMBOO_WOOD_TRAPDOOR_CLOSE,
+                    SoundSource.BLOCKS,
+                    1.0f,
+                    1.0f
+            );
+        }
+
+        ctx.setPacketHandled(true);
     }
 }

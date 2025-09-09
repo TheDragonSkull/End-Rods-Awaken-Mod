@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
 import net.thedragonskull.rodsawaken.block.entity.AwakenedEndRodBE;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,7 +83,9 @@ public class AwakenedEndRod extends EndRodBlock implements EntityBlock {
                 }
             } else {
                 if (be instanceof AwakenedEndRodBE rodBE) {
-                    NetworkHooks.openScreen((ServerPlayer) player, rodBE, pos);
+                    //NetworkHooks.openScreen((ServerPlayer) player, rodBE, pos);
+                    if (player instanceof ServerPlayer sp)
+                        sp.openMenu(rodBE); //todo: test
                 }
             }
         }
