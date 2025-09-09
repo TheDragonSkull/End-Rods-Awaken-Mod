@@ -2,6 +2,9 @@ package net.thedragonskull.rodsawaken.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -26,6 +29,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.block.SculkSensorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -87,11 +91,13 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
                 }
 
                 if (stack.getItem() == Items.POTION) {
-                    List<MobEffectInstance> effects = PotionUtils.getMobEffects(stack);
+                    PotionContents potioncontents = stack.get(DataComponents.POTION_CONTENTS);
 
-                    for (MobEffectInstance effect : effects) {
-                        if (effect.getEffect().isInstantenous()) {
-                            return false;
+                    if (potioncontents != null) {
+                        for (MobEffectInstance effect : potioncontents.getAllEffects()) {
+                            if (effect.getEffect().value().isInstantenous()) {
+                                return false;
+                            }
                         }
                     }
                     return true;
@@ -246,15 +252,14 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
 
         int refreshInterval = 40; // 2s
 
-        Map<MobEffect, Integer> mergedLevels = new HashMap<>();
+        Map<Holder<MobEffect>, Integer> mergedLevels = new HashMap<>();
         for (int i = 0; i < 3; i++) {
             if (potionTimers[i] <= 0 || potionEffects[i].isEmpty()) continue;
 
             for (MobEffectInstance effect : potionEffects[i]) {
-                MobEffect mob = effect.getEffect();
-                if (mob.isInstantenous()) continue;
+                Holder<MobEffect> mob = effect.getEffect();
+                if (mob.value().isInstantenous()) continue;
 
-                // usamos el nivel real (amplifier + 1)
                 int levelValue = effect.getAmplifier() + 1;
                 mergedLevels.merge(mob, levelValue, Integer::sum);
             }
@@ -263,8 +268,8 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         mergedLevels.replaceAll((mob, lvl) -> Math.min(lvl, 6));
 
         for (LivingEntity target : targets) {
-            for (Map.Entry<MobEffect, Integer> entry : mergedLevels.entrySet()) {
-                MobEffect mob = entry.getKey();
+            for (Map.Entry<Holder<MobEffect>, Integer> entry : mergedLevels.entrySet()) {
+                Holder<MobEffect> mob = entry.getKey();
                 int levelValue = entry.getValue();
 
                 int amplifier = levelValue - 1;
@@ -478,20 +483,24 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     private void consumePotionIntoSlot(int slot, ItemStack stack) {
         if (stack.isEmpty() || stack.getItem() != Items.POTION) return;
 
-        List<MobEffectInstance> effects = PotionUtils.getMobEffects(stack);
-        if (effects.isEmpty()) return;
+        PotionContents potionContents = stack.get(DataComponents.POTION_CONTENTS);
+        if (potionContents == null) return;
+
+        Iterable<MobEffectInstance> effectsIterable = potionContents.getAllEffects();
 
         potionEffects[slot].clear();
-        potionEffects[slot].addAll(effects);
+        for (MobEffectInstance eff : effectsIterable) {
+            potionEffects[slot].add(eff);
+        }
 
-        int maxDuration = effects.stream()
-                .mapToInt(MobEffectInstance::getDuration)
-                .max()
-                .orElse(0);
+        int maxDuration = 0;
+        for (MobEffectInstance eff : effectsIterable) {
+            maxDuration = Math.max(maxDuration, eff.getDuration());
+        }
 
         potionDurations[slot] = maxDuration;
         potionTimers[slot] = maxDuration;
-        potionColors[slot] = PotionUtils.getColor(stack);
+        potionColors[slot] = potionContents.getColor();
 
         stack.shrink(1);
 
@@ -541,8 +550,8 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider pRegistries) {
+        super.loadAdditional(tag, pRegistries);
         items.deserializeNBT(tag.getCompound("Inventory"));
 
         autoMode = tag.getBoolean("AutoMode");
@@ -579,11 +588,18 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        super.onDataPacket(net, pkt);
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider pRegistries) {
+        super.onDataPacket(net, pkt, pRegistries);
         if (level != null && level.isClientSide) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         }
+    }
+
+    @Override
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.Provider pRegistries) {
+        CompoundTag tag = new CompoundTag();
+        this.saveAdditional(tag, pRegistries);
+        return tag;
     }
 
     @Nullable
@@ -593,15 +609,8 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public @NotNull CompoundTag getUpdateTag() {
-        CompoundTag tag = new CompoundTag();
-        this.saveAdditional(tag);
-        return tag;
-    }
-
-    @Override
-    public void handleUpdateTag(CompoundTag tag) {
-        this.load(tag);
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider holders) {
+        this.loadAdditional(tag, holders);
     }
 
     @Override

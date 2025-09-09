@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -91,7 +92,7 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                         effectInstance = effects.get(index);
                     }
 
-                    MobEffect mobEffect = effectInstance.getEffect();
+                    Holder<MobEffect> mobEffect = effectInstance.getEffect();
                     TextureAtlasSprite sprite = minecraft.getMobEffectTextures().get(mobEffect);
 
                     int atlasSize = 128;
@@ -208,7 +209,7 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        this.renderBackground(guiGraphics);
+        this.renderBackground(guiGraphics, mouseX, mouseY, delta);
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
 
