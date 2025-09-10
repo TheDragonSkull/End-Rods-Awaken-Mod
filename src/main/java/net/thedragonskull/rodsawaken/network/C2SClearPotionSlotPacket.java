@@ -1,46 +1,28 @@
 package net.thedragonskull.rodsawaken.network;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.thedragonskull.rodsawaken.block.entity.AwakenedEndRodBE;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.thedragonskull.rodsawaken.RodsAwaken;
 
-public class C2SClearPotionSlotPacket {
-    private final int slot;
-    private final BlockPos pos;
+public record C2SClearPotionSlotPacket(int slot, BlockPos pos) implements CustomPacketPayload {
 
-    public C2SClearPotionSlotPacket(int slot, BlockPos pos) {
-        this.slot = slot;
-        this.pos = pos;
-    }
+    public static final CustomPacketPayload.Type<C2SClearPotionSlotPacket> TYPE =
+            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(RodsAwaken.MOD_ID, "clear_potion_slot_packet"));
 
-    public C2SClearPotionSlotPacket(FriendlyByteBuf buf) {
-        this.slot = buf.readInt();
-        this.pos = buf.readBlockPos();
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, C2SClearPotionSlotPacket> STREAM_CODEC =
+            StreamCodec.composite(
+                    ByteBufCodecs.INT,
+                    C2SClearPotionSlotPacket::slot,
+                    BlockPos.STREAM_CODEC,
+                    C2SClearPotionSlotPacket::pos,
+                    C2SClearPotionSlotPacket::new);
 
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeInt(slot);
-        buf.writeBlockPos(pos);
-    }
-
-    public static void handle(C2SClearPotionSlotPacket msg, CustomPayloadEvent.Context ctx) {
-        ServerPlayer player = ctx.getSender();
-        if (player == null) return;
-
-        ServerLevel level = player.serverLevel();
-        BlockEntity be = level.getBlockEntity(msg.pos);
-
-        if (be instanceof AwakenedEndRodBE awakened) {
-            awakened.clearPotionSlot(msg.slot);
-            level.playSound(null, msg.pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 1.0F);
-        }
-
-        ctx.setPacketHandled(true);
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

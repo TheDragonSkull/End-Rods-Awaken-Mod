@@ -18,10 +18,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.thedragonskull.rodsawaken.RodsAwaken;
 import net.thedragonskull.rodsawaken.network.C2SToggleBlockedSlotPacket;
 import net.thedragonskull.rodsawaken.network.C2SClearPotionSlotPacket;
-import net.thedragonskull.rodsawaken.network.PacketHandler;
 import net.thedragonskull.rodsawaken.util.SensorSlotTooltip;
 
 import java.util.ArrayList;
@@ -189,7 +189,7 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
                 if (mouseX >= iconX && mouseX <= iconEndX &&
                         mouseY >= iconY && mouseY <= iconEndY) {
                     if (Screen.hasShiftDown()) {
-                        PacketHandler.sendToServer(new C2SToggleBlockedSlotPacket(i));
+                        PacketDistributor.sendToServer(new C2SToggleBlockedSlotPacket(i));
 
 
                     }
@@ -204,7 +204,7 @@ public class AwakenedEndRodScreen extends AbstractContainerScreen<AwakenedEndRod
 
     private void onPotionButtonClicked(int slot) {
         BlockPos pos = this.menu.getBlockEntity().getBlockPos();
-        PacketHandler.sendToServer(new C2SClearPotionSlotPacket(slot, pos));
+        PacketDistributor.sendToServer(new C2SClearPotionSlotPacket(slot, pos));
     }
 
     @Override

@@ -1,46 +1,25 @@
 package net.thedragonskull.rodsawaken.network;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.thedragonskull.rodsawaken.block.entity.AwakenedEndRodBE;
-import net.thedragonskull.rodsawaken.screen.AwakenedEndRodMenu;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.thedragonskull.rodsawaken.RodsAwaken;
 
-public class C2SToggleBlockedSlotPacket {
-    private final int slot;
+public record C2SToggleBlockedSlotPacket(int slot) implements CustomPacketPayload {
 
-    public C2SToggleBlockedSlotPacket(int slot) {
-        this.slot = slot;
-    }
+    public static final CustomPacketPayload.Type<C2SToggleBlockedSlotPacket> TYPE =
+            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(RodsAwaken.MOD_ID, "toggle_blocked_slot_packet"));
 
-    public C2SToggleBlockedSlotPacket(FriendlyByteBuf buf) {
-        this.slot = buf.readVarInt();
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, C2SToggleBlockedSlotPacket> STREAM_CODEC =
+            StreamCodec.composite(
+                    ByteBufCodecs.INT,
+                    C2SToggleBlockedSlotPacket::slot,
+                    C2SToggleBlockedSlotPacket::new);
 
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeVarInt(slot);
-    }
-
-    public static void handle(C2SToggleBlockedSlotPacket msg, CustomPayloadEvent.Context ctx) {
-        ServerPlayer player = ctx.getSender();
-        if (player != null && player.containerMenu instanceof AwakenedEndRodMenu menu) {
-            AwakenedEndRodBE be = menu.getBlockEntity();
-
-            boolean wasBlocked = be.isSlotBlocked(msg.slot);
-            be.toggleBlocked(msg.slot);
-            be.setChanged();
-            be.syncToClient();
-
-            player.playNotifySound(
-                    wasBlocked ? SoundEvents.BAMBOO_WOOD_TRAPDOOR_OPEN : SoundEvents.BAMBOO_WOOD_TRAPDOOR_CLOSE,
-                    SoundSource.BLOCKS,
-                    1.0f,
-                    1.0f
-            );
-        }
-
-        ctx.setPacketHandled(true);
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }
