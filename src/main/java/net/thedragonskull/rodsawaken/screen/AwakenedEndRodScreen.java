@@ -17,7 +17,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import net.thedragonskull.rodsawaken.RodsAwaken;
 import net.thedragonskull.rodsawaken.network.C2SToggleBlockedSlotPacket;
 import net.thedragonskull.rodsawaken.network.C2SClearPotionSlotPacket;

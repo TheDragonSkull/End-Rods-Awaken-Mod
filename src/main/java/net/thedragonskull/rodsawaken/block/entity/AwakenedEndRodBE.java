@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -34,11 +35,10 @@ import net.minecraft.world.level.block.SculkSensorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.thedragonskull.rodsawaken.RodsAwaken;
 import net.thedragonskull.rodsawaken.particle.ModParticles;
 import net.thedragonskull.rodsawaken.screen.AwakenedEndRodMenu;
 import org.jetbrains.annotations.NotNull;
@@ -118,60 +118,44 @@ public class AwakenedEndRodBE extends BlockEntity implements MenuProvider {
         }
     };
 
+    public final IItemHandler hopperItemHandler = new IItemHandler() {
+        @Override
+        public int getSlots() {
+            return 3;
+        }
+
+        @Override
+        public @NotNull ItemStack getStackInSlot(int slot) {
+            return items.getStackInSlot(slot);
+        }
+
+        @Override
+        public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+            return items.insertItem(slot, stack, simulate);
+        }
+
+        @Override
+        public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+            return items.extractItem(slot, amount, simulate);
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return items.getSlotLimit(slot);
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+            return items.isItemValid(slot, stack);
+        }
+    };
+
+
     public AwakenedEndRodBE(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.AWAKENED_END_ROD_BE.get(), pPos, pBlockState);
         for (int i = 0; i < 3; i++) {
             potionEffects[i] = new ArrayList<>();
         }
-    }
-
-    private final LazyOptional<IItemHandler> hopperItemHandler = LazyOptional.of(() ->
-            new IItemHandler() {
-                @Override
-                public int getSlots() {
-                    return 3;
-                }
-
-                @Override
-                public @NotNull ItemStack getStackInSlot(int slot) {
-                    return items.getStackInSlot(slot);
-                }
-
-                @Override
-                public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-                    return items.insertItem(slot, stack, simulate);
-                }
-
-                @Override
-                public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-                    return items.extractItem(slot, amount, simulate);
-                }
-
-                @Override
-                public int getSlotLimit(int slot) {
-                    return items.getSlotLimit(slot);
-                }
-
-                @Override
-                public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-                    return items.isItemValid(slot, stack);
-                }
-            }
-    );
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER) {
-            return hopperItemHandler.cast();
-        }
-        return super.getCapability(cap, side);
-    }
-
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-        hopperItemHandler.invalidate();
     }
 
     public void tick() {

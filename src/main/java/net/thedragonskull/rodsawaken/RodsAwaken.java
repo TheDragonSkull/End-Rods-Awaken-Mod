@@ -65,8 +65,6 @@ public class RodsAwaken {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            MenuScreens.register(ModMenuTypes.AWAKENED_END_ROD_MENU.get(), AwakenedEndRodScreen::new);
-
             event.enqueueWork(PacketHandler::register);
         }
     }
