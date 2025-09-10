@@ -5,16 +5,17 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.thedragonskull.rodsawaken.block.ModBlocks;
 import net.thedragonskull.rodsawaken.block.entity.ModBlockEntities;
 import net.thedragonskull.rodsawaken.item.ModItems;
@@ -29,8 +30,7 @@ public class RodsAwaken {
     public static final String MOD_ID = "rodsawaken";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public RodsAwaken(FMLJavaModLoadingContext context) {
-        IEventBus modEventBus = context.getModEventBus();
+    public RodsAwaken(IEventBus modEventBus, ModContainer container) {
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
@@ -39,9 +39,9 @@ public class RodsAwaken {
         ModParticles.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
-
-        MinecraftForge.EVENT_BUS.register(this);
         modEventBus.addListener(this::addCreative);
+
+        NeoForge.EVENT_BUS.register(this);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -50,9 +50,10 @@ public class RodsAwaken {
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
-            event.getEntries().putAfter(Blocks.END_ROD.asItem().getDefaultInstance(),
+            event.insertAfter(Blocks.END_ROD.asItem().getDefaultInstance(),
                     ModBlocks.AWAKENED_END_ROD.get().asItem().getDefaultInstance(),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+
         }
     }
 
@@ -60,7 +61,7 @@ public class RodsAwaken {
     public void onServerStarting(ServerStartingEvent event) {
     }
 
-    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
